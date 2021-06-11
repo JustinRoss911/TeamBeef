@@ -13,15 +13,48 @@ library(lubridate)
 
 #Loading Data ----
 
-test1 <- read.csv(file = 'raw/testData/testAcc1.csv', header = TRUE)
-test2 <- read.csv(file = 'raw/testData/testAcc1.csv', header = TRUE)
+test1 <- read.csv(file = 'raw/accl/post/PostAccl1 Part1.csv', header = TRUE)
+test2 <- read.csv(file = 'raw/accl/post/PostAccl1 Part2.csv', header = TRUE)
+test <- rbind(test1, test1)
+testTime <- mstConversion(test)
+
+testChar = "Hello"
+paste(testChar, "World", sep=" ")
+
+#generates a list of all files within 
+testList <- list.files("raw/accl/post")
+holdFrame <- 0 
+counter <- 0 
+
+for(i in 1:length(testList))
+{
+  if(substr(testList[i], 9, 10) == "1 ") {
+    
+    filePath <- paste('raw/accl/post/', testList[i], sep="") 
+    
+    holdFrame <- read.csv(file = filePath, header = TRUE)
+    
+    if(counter == 0) {
+      copyFrame <- holdFrame
+      
+    }
+    else {
+      copyFrame <- rbind(copyFrame, holdFrame)
+    }
+    
+    counter <- counter + 1
+    
+  }
+
+
+}
 
 #Functions ----
 mstConversion <- function(data)
 {
-  tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
+  tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M:%S", tz = "GMT")
   tempData  <- with_tz(tempDate, "America/Edmonton")
-  data$MST <- tempData 
+  data$GMT <- tempData 
   
   return(data)  
 }
