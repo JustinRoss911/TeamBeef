@@ -22,32 +22,8 @@ testChar = "Hello"
 paste(testChar, "World", sep=" ")
 
 #generates a list of all files within 
-testList <- list.files("raw/accl/post")
-holdFrame <- 0 
-counter <- 0 
 
-for(i in 1:length(testList))
-{
-  if(substr(testList[i], 9, 10) == "1 ") {
-    
-    filePath <- paste('raw/accl/post/', testList[i], sep="") 
-    
-    holdFrame <- read.csv(file = filePath, header = TRUE)
-    
-    if(counter == 0) {
-      copyFrame <- holdFrame
-      
-    }
-    else {
-      copyFrame <- rbind(copyFrame, holdFrame)
-    }
-    
-    counter <- counter + 1
-    
-  }
-
-
-}
+test <- acclPrep("1 ") 
 
 #Functions ----
 mstConversion <- function(data)
@@ -136,7 +112,6 @@ indexCopyFrame6 <- function(dataInput, index)
   
   return(copyFrame)
 }
-
 
 analyzeFixes <- function(data)
 {
@@ -255,4 +230,35 @@ speedFromGPS <- function(p1, p2)
   speed <- distance / differenceTime
   
   return(speed)
+}
+
+acclPrep <- function(index)
+{
+  testList <- list.files("raw/accl/post")
+  counter <- 0 
+  
+  for(i in 1:length(testList))
+  {
+    if(substr(testList[i], 9, 10) == index) {
+      
+      filePath <- paste('raw/accl/post/', testList[i], sep="") 
+      
+      holdFrame <- read.csv(file = filePath, header = TRUE)
+      
+      if(counter == 0) {
+        copyFrame <- holdFrame
+        
+      }
+      else {
+        copyFrame <- rbind(copyFrame, holdFrame)
+      }
+      
+      counter <- counter + 1
+      
+    }
+  }
+  
+  data <- mstConversion(copyFrame)
+  
+  return(data)
 }
