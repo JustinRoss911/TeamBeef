@@ -81,27 +81,17 @@ PGdf2 <- read.csv(file = 'Data/GPS/PinPoint 80379 2020-11-09 13-05-18.csv', head
 #Working Tests Distance----
 
 testData <- read.csv(file = 'Data/GPS/testGPS.csv', header = TRUE)
-testData <- mstConversion(testData)
+yot <- mstConversion(yot)
 
-testData <- PGdf1
+testGPS1 <- testData[90,]
+testGPS2 <- testData[91,]
 
-analyze <- analyzeNewTest(testData)
 
-testGPS <- testData %>% select(Latitude, Longitude)
-
-test <- testGPS[c('Longitude', "Latitude")]
-
-testGPS1 <- test[90,]
-testGPS2 <- test[91,]
-
-distance <- distGeo(testGPS1, testGPS2)
-
-differenceTime <- as.numeric((testData$MST[91] - testData$MST[90]), units ="secs")
-
-speed <- distance / differenceTime
+new <- speedFromGPS(testGPS1, testGPS2)
 
 #Working Test Proximity Selc
-filter(testData, Fix %in% c("Proximity GPS Schedule"))
+#need to extract before converting to MST 
+yot <- filter(testData, Fix %in% c("GPS Schedule"))
 
 #Testing Functions ----
 
@@ -200,6 +190,7 @@ indexCopyFrame6 <- function(dataInput, index)
 
 analyzeFixes <- function(data)
 {
+  #2020-07-13 for pre/post switch over
   dates <- seq(as.Date("2020-06-18"), as.Date("2020-09-16"), by="days")
   
   copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
@@ -297,5 +288,22 @@ analyzeFixes <- function(data)
   
   colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
   return(copyFrame)
+}
+
+speedFromGPS <- function(p1, p2)
+{
+  p1GPS <- p1 %>% select(Latitude, Longitude)
+  p2GPS <- p2 %>% select(Latitude, Longitude)
+  
+  p1GPS <- p1GPS[c('Longitude', "Latitude")]
+  p2GPS <- p2GPS[c('Longitude', "Latitude")]
+  
+  distance <- distGeo(p1GPS, p2GPS)
+  
+  time <- as.numeric((p1$GMT - p2$GMT), units ="secs")
+  
+  speed <- distance / differenceTime
+  
+  return(speed)
 }
 
