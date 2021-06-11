@@ -6,13 +6,14 @@ library(tidyverse)
 #library(dplyr)
 #library(readr)
 library(lubridate)
+library(geosphere)
 
 #to remove all variables when needed
 #rm(list=ls())
 
 
 #Data Loading ----
- PGdf1 <- read.csv(file = 'Data/GPS/PinPoint 80378 2020-11-09 10-57-44.csv', header = TRUE)
+PGdf1 <- read.csv(file = 'Data/GPS/PinPoint 80378 2020-11-09 10-57-44.csv', header = TRUE)
 PGdf2 <- read.csv(file = 'Data/GPS/PinPoint 80379 2020-11-09 13-05-18.csv', header = TRUE)
 # PGdf3 <- read.csv(file = 'Data/GPS/PinPoint 80380 2020-11-09 13-18-22.csv', header = TRUE)
 # PGdf4 <- read.csv(file = 'Data/GPS/PinPoint 80381 2020-11-09 13-48-25.csv', header = TRUE)
@@ -86,107 +87,20 @@ testData <- PGdf1
 
 analyze <- analyzeNewTest(testData)
 
+testGPS <- testData %>% select(Latitude, Longitude)
+
+test <- testGPS[c('Longitude', "Latitude")]
+
+testGPS1 <- test[90,]
+testGPS2 <- test[91,]
+
+testGPS1$Longitude <- testGPS1$Longitude - 180
+testGPS2$Longitude <- testGPS1$Longitude - 180
+
+distGeo(testGPS1, testGPS2)
+
 #Testing Functions ----
-analyzeNewTest <- function(data)
-{
-  dates <- seq(as.Date("2020-07-13"), as.Date("2020-09-16"), by="days")
-  
-  copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
-                          No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), 
-                          Per_No_Fix=character(0), Per_Missing_Fix=character(0))
-  
-  
-  
-  for(i in 1:length(dates))
-  {
-    dateCounter <- 0
-    noFix <- 0 
-    lateFix <- 0 
-    earlyFix <- 0 
-    Fix <- 0 
-    expFix <- 0 
-    differenceTime <- 0 
-    firstCheck <- TRUE 
-    dateStart <- 0 
-    dateEnd <- 0 
-    perNo <- 0
-    perMiss <- 0 
-    expectedFix <- 0 
-    
-    for(j in 2:(nrow(data)-1))
-    {
-      if(as.Date(data$MST[j]) == dates[i]) { #same day
-        
-        differenceTime <- as.numeric((data$MST[j] - data$MST[j - 1]), units ="mins")
-        
-        if(data$Latitude[j] == 0 | data$Longitude[j] == 0 | data$Altitude[j] == 0) {
-          noFix <- noFix + 1
-        }
-        
-        else if(3 < differenceTime && differenceTime < 7) { #fix
-          Fix <- Fix + 1
-        }
-        
-        else if(3 >= differenceTime) { #early
-          earlyFix <- earlyFix + 1
-        }
-        
-        else if(differenceTime <= 7) { #late
-          lateFix <- lateFix + 1
-        }
-        
-        if(firstCheck) {  #first
-          dateStart <- data$MST[j]
-          firstCheck <- FALSE
-        }
-        
-        else if(TRUE) { #last
-          dateEnd <- data$MST[j]
-        }
-        
-        dateCounter <- dateCounter + 1
-      }
-      
-    }
-    
-    rowDate <- as.character(dates[i])
-    
-    
-    if(dateCounter == 0) {
-      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, perNo, perMiss)
-      copyFrame <- rbind(copyFrame, holdFrame)
-    }
-    
-    else {
-      periodDate <- as.interval(dateStart, dateEnd)
-      
-      if (i == 1) {
-        expectedFix <- ceiling( periodDate / minutes(5) )
-      }
-      else if (i == length(dates)) {
-        expectedFix <- ceiling( periodDate / minutes(5) )
-      }
-      else {
-        expectedFix <- 288
-        
-      }
-      
-      perNo <- (noFix / (lateFix + earlyFix + Fix)) * 100 
-      perNo <- paste(perNo, "%")
-      
-      perMiss <- ((expectedFix - (lateFix + earlyFix + Fix)) / expectedFix) * 100 
-      perMiss <- paste(perMiss, "%")
-      
-      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, perNo, perMiss)
-      copyFrame <- rbind(copyFrame, holdFrame)
-    }
-    
-    
-  }
-  
-  colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
-  return(copyFrame)
-}
+
 
 yot <- TRUE
 
