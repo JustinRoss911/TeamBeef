@@ -78,7 +78,7 @@ PGdf2 <- read.csv(file = 'Data/GPS/PinPoint 80379 2020-11-09 13-05-18.csv', head
 # write.csv(PGdf14, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post14GPS.csv", row.names = FALSE)
 
 
-#Working Tests ----
+#Working Tests Distance----
 
 testData <- read.csv(file = 'Data/GPS/testGPS.csv', header = TRUE)
 testData <- mstConversion(testData)
@@ -94,10 +94,14 @@ test <- testGPS[c('Longitude', "Latitude")]
 testGPS1 <- test[90,]
 testGPS2 <- test[91,]
 
-testGPS1$Longitude <- testGPS1$Longitude - 180
-testGPS2$Longitude <- testGPS1$Longitude - 180
+distance <- distGeo(testGPS1, testGPS2)
 
-distGeo(testGPS1, testGPS2)
+differenceTime <- as.numeric((testData$MST[91] - testData$MST[90]), units ="secs")
+
+speed <- distance / differenceTime
+
+#Working Test Proximity Selc
+filter(testData, Fix %in% c("Proximity GPS Schedule"))
 
 #Testing Functions ----
 
@@ -105,6 +109,7 @@ distGeo(testGPS1, testGPS2)
 yot <- TRUE
 
 #Functions ----
+
 mstConversion <- function(data)
 {
   tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
