@@ -21,14 +21,26 @@ testTime <- mstConversion(test)
 testChar = "Hello"
 paste(testChar, "World", sep=" ")
 
+testYot <- test[18:55,]
+
+test2 <- test[1,1]
+
+test2[1]
+
+toot <- test %>% select(X)
 #generates a list of all files within 
 
 test <- acclPrep("1 ") 
+tempData <- test[test$X == 0,]
+dataOutput <- as.numeric(rownames(tempData))
+bf <- indexCopyFrame(test, index)
+
+index <- c(1,2)
 
 #Functions ----
 mstConversion <- function(data)
 {
-  tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M:%S", tz = "GMT")
+  tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
   tempData  <- with_tz(tempDate, "America/Edmonton")
   data$GMT <- tempData 
   
@@ -46,6 +58,20 @@ indexGPSZero <- function(dataInput)
   
   return(dataOutput)
   
+}
+
+indexCopyFrame <- function(dataInput, index)
+{
+  #set the same structure as the input dataframe
+  copyFrame <- dataInput[0, ]
+  
+  #runs the length of the index vector
+  for(i in 1:length(index))
+  {
+    copyFrame <- rbind(copyFrame, dataInput[index[i],])
+  }
+  
+  return(copyFrame)
 }
 
 indexCopyFrame5 <- function(dataInput, index)
@@ -259,6 +285,10 @@ acclPrep <- function(index)
   }
   
   data <- mstConversion(copyFrame)
+  
+  data$X <- data$X * 0.31392 
+  data$Y <- data$Y * 0.31392 
+  data$Z <- data$Z * 0.31392 
   
   return(data)
 }
