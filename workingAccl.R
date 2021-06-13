@@ -13,29 +13,20 @@ library(lubridate)
 
 #Loading Data ----
 
-test1 <- read.csv(file = 'raw/accl/post/PostAccl1 Part1.csv', header = TRUE)
-test2 <- read.csv(file = 'raw/accl/post/PostAccl1 Part2.csv', header = TRUE)
-test <- rbind(test1, test1)
-testTime <- mstConversion(test)
+#subset works super nicely 
+#what think will do, is run the same for loop over the date intervals to develop the data 
+#will then look to  have the subsetted data for the features that we are curious in searching for
+test <- acclPrep("11")
+newTest <- subset(test, date(GMT) == as.Date("2020-07-27")) 
+newTest <- newTest %>% select(sum)
+#this provides teh magnitude of forces
+df <- transform(test, SUM = sqrt(X*X + Y*Y + Z*Z))
 
-testChar = "Hello"
-paste(testChar, "World", sep=" ")
+df <- transform(test, test = newTest)
 
-testYot <- test[18:55,]
+date(df$GMT[1]) == as.Date("2020-07-12")
 
-test2 <- test[1,1]
-
-test2[1]
-
-toot <- test %>% select(X)
-#generates a list of all files within 
-
-test <- acclPrep("1 ") 
-tempData <- test[test$X == 0,]
-dataOutput <- as.numeric(rownames(tempData))
-bf <- indexCopyFrame(test, index)
-
-index <- c(1,2)
+max(df$sum)
 
 #Functions ----
 mstConversion <- function(data)
