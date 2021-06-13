@@ -16,7 +16,7 @@ library(lubridate)
 testData1 <- read.csv(file = "raw/testData/PostProx1.csv", header = TRUE, stringsAsFactors=FALSE)
 testData1 <- transform(testData1, ID = 30380)
  
-testData2 <- read.csv(file = "raw/testData/PostProx2.csv", header = TRUE ,stringsAsFactors=FALSE)
+testData2 <- read.csv(file = "raw/testData/PostProx2.csv", header = TRUE, stringsAsFactors=FALSE)
 testData2 <- transform(testData1, ID = 30381)
 
 combTest <- testData1[1,]
@@ -26,31 +26,45 @@ combTest$Session <- combTest$Session +testData1$Session[2]
 
 newTest <- rbind(testData1, testData2)
 
-newTest <- testData1
+newTest <- testData2
 
 combTest <- newTest[1,]
-copyFrame <- newTest[1,]
+copyFrame <- newTest[0,]
 
-for(i in 1:(nrow(newTest) - 1))
+for(i in 20:40)#(nrow(newTest) - 1))
 {
-  if(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
-  {
+if(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
+ {
     copyFrame <- newTest[i, ]
     
-    while(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
+    while(newTest$Stop[i] == newTest$Start[i + 1])
     {
-      copyFrame$Stop <- newTest$Stop[i + 1]
-      copyFrame$Session <- copyFrame$Session + newTest$Session[i + 1]
-      copyFrame$RSSI <- (copyFrame$RSSI + newTest$RSSI[i + 1]) / 2
-      i <- i + 1
+      if(newTest$Proximity[i] == newTest$Proximity[i + 1])
+      {
+        copyFrame$Stop <- newTest$Stop[i + 1]
+        copyFrame$Session <- copyFrame$Session + newTest$Session[i + 1]
+        copyFrame$RSSI <- (copyFrame$RSSI + newTest$RSSI[i + 1]) / 2
+        i <- i + 1
+      }
+      else
+      {
+        i <- i + 1
+      }
+      print("while")
+      print(i)
     }
-  }
-  else
-  {
-    copyFrame <- newTest[i,]
-  }
+ }
+ else
+ {
+   copyFrame <- newTest[i,]
+ }
+  print("comb")
+  print(i)
   combTest <- rbind(combTest, copyFrame)
 }
+
+combTest <- subset(combTest, Proximity == 30387)
+testData2 <- subset(testData2, Proximity == 30387)
 
 
 #Testing Comb ----
