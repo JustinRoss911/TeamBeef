@@ -13,10 +13,10 @@ library(lubridate)
 
 #Data Loading ---- 
 
-testData1 <- read.csv(file = "raw/testData/PostProx1.csv", header = TRUE)
+testData1 <- read.csv(file = "raw/testData/PostProx1.csv", header = TRUE, stringsAsFactors=FALSE)
 testData1 <- transform(testData1, ID = 30380)
  
-testData2 <- read.csv(file = "raw/testData/PostProx2.csv", header = TRUE)
+testData2 <- read.csv(file = "raw/testData/PostProx2.csv", header = TRUE ,stringsAsFactors=FALSE)
 testData2 <- transform(testData1, ID = 30381)
 
 combTest <- testData1[1,]
@@ -24,29 +24,48 @@ combTest$Stop <- testData1$Stop[2]
 combTest$Session <- combTest$Session +testData1$Session[2]
 #Working Tests ----
 
-test <- rbind(testData1, testData2)
+newTest <- rbind(testData1, testData2)
 
-newTest <- subset(test, Session != 0) 
+newTest <- testData1
 
 combTest <- newTest[1,]
-copyFrame <- newTest[0,]
+copyFrame <- newTest[1,]
 
 for(i in 1:(nrow(newTest) - 1))
 {
-  # if(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
-  # {
-  #   combTest <- newTest[i, ]
-  #   combTest$Stop <- newTest$Stop[i + 1]
-  #   combTest$Session <- combTest$Session + newTest$Session[i + 1]
-  #   i <- i + 1
-  # }
-  # else
+  if(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
+  {
+    copyFrame <- newTest[i, ]
+    
+    while(newTest$Proximity[i] == newTest$Proximity[i + 1] & newTest$Stop[i] == newTest$Start[i + 1])
+    {
+      copyFrame$Stop <- newTest$Stop[i + 1]
+      copyFrame$Session <- copyFrame$Session + newTest$Session[i + 1]
+      copyFrame$RSSI <- (copyFrame$RSSI + newTest$RSSI[i + 1]) / 2
+      i <- i + 1
+    }
+  }
+  else
   {
     copyFrame <- newTest[i,]
   }
-  combTest <- cbind(combTest, copyFrame)
+  combTest <- rbind(combTest, copyFrame)
 }
 
+
+#Testing Comb ----
+combTest <- newTest[1,]
+copyFrame <- newTest[1,]
+
+
+if(newTest$Proximity[8] == newTest$Proximity[8 + 1] & newTest$Stop[8] == newTest$Start[8 + 1])
+{
+  copyFrame <- newTest[8, ]
+  copyFrame$Stop <- newTest$Stop[8 + 1]
+  copyFrame$Session <- copyFrame$Session + newTest$Session[8 + 1]
+  copyFrame$RSSI <- (copyFrame$RSSI + newTest$RSSI[8 + 1]) / 2
+  i <- 8 + 1
+}
 
 #Functions ----
 mstConversion <- function(data)
