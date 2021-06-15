@@ -41,6 +41,12 @@ newTest <- subset(test, date(GMT) == dates[1])
 test2 <- df[df$SUM > upper_bound,]
 test3 <- df[df$SUM >z | df$SUM <z1,]
 
+#this method will work well, can take this general idea to compare 
+df <- transform(df, Test1 = as.numeric(df$GMT))
+test4 <- df[df$Test1 > 1595500980, ]
+#how to handle GPS prox comparison is still being thought of
+
+
 newTest <- df %>% select(SUM)
 #this provides teh magnitude of forces
 df <- transform(test, SUM = sqrt(X*X + Y*Y + Z*Z))

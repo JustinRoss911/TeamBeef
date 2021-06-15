@@ -81,6 +81,10 @@ if(newTest$Proximity[8] == newTest$Proximity[8 + 1] & newTest$Stop[8] == newTest
   i <- 8 + 1
 }
 
+#apply this since it will give seconds since the epoch, add +/- some to be determined value and check to see if the start time falls within the range of it. 
+#as.numeric((df$GMT[2] - df$GMT[2118]), units ="secs")
+
+
 #Functions ----
 mstConversion <- function(data)
 {
