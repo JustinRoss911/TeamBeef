@@ -28,6 +28,7 @@ PGdf12 <- read.csv(file = 'raw/gps/post/PinPoint 80389 2020-11-09 10-05-18.csv',
 PGdf13 <- read.csv(file = 'raw/gps/post/PinPoint 80390 2020-11-05 14-37-10.csv', header = TRUE)
 PGdf14 <- read.csv(file = 'raw/gps/post/PinPoint 80391 2020-11-09 12-39-21.csv', header = TRUE)
 
+
 #Calling MST Conversion Functions ----
 PGdf1 <- mstConversion(PGdf1)
 PGdf2 <- mstConversion(PGdf2)
@@ -61,20 +62,20 @@ RPGdf13 <- analyzeFixes(PGdf13)
 RPGdf14 <- analyzeFixes(PGdf14)
 
 #Data Output ----
-write.csv(RPGdf1, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost1GPS.csv", row.names = FALSE)
-write.csv(RPGdf2, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost2GPS.csv", row.names = FALSE)
-write.csv(RPGdf3, "F:/Development/Projects/Research/TeamBeef/workingProjectvoutput/APost3GPS.csv", row.names = FALSE)
-write.csv(RPGdf4, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost4GPS.csv", row.names = FALSE)
-write.csv(RPGdf5, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost5GPS.csv", row.names = FALSE)
-write.csv(RPGdf6, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost6GPS.csv", row.names = FALSE)
-write.csv(RPGdf7, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost7GPS.csv", row.names = FALSE)
-write.csv(RPGdf8, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost8GPS.csv", row.names = FALSE)
-write.csv(RPGdf9, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost9GPS.csv", row.names = FALSE)
-write.csv(RPGdf10, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost10GPS.csv", row.names = FALSE)
-write.csv(RPGdf11, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost11GPS.csv", row.names = FALSE)
-write.csv(RPGdf12, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost12GPS.csv", row.names = FALSE)
-write.csv(RPGdf13, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost13GPS.csv", row.names = FALSE)
-write.csv(RPGdf14, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost14GPS.csv", row.names = FALSE)
+write.csv(RPGdf1, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost1GPS.csv", row.names = FALSE)
+write.csv(RPGdf2, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost2GPS.csv", row.names = FALSE)
+write.csv(RPGdf3, "F:/Development/Projects/Research/TeamBeef/workingProjectvoutput/post/APost3GPS.csv", row.names = FALSE)
+write.csv(RPGdf4, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost4GPS.csv", row.names = FALSE)
+write.csv(RPGdf5, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost5GPS.csv", row.names = FALSE)
+write.csv(RPGdf6, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost6GPS.csv", row.names = FALSE)
+write.csv(RPGdf7, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost7GPS.csv", row.names = FALSE)
+write.csv(RPGdf8, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost8GPS.csv", row.names = FALSE)
+write.csv(RPGdf9, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost9GPS.csv", row.names = FALSE)
+write.csv(RPGdf10, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost10GPS.csv", row.names = FALSE)
+write.csv(RPGdf11, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost11GPS.csv", row.names = FALSE)
+write.csv(RPGdf12, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost12GPS.csv", row.names = FALSE)
+write.csv(RPGdf13, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost13GPS.csv", row.names = FALSE)
+write.csv(RPGdf14, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost14GPS.csv", row.names = FALSE)
 
 
 #Working Tests Distance----
