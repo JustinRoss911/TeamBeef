@@ -15,68 +15,66 @@ library(geosphere)
 #Data Loading ----
 PGdf1 <- read.csv(file = 'raw/gps/post/PinPoint 80378 2020-11-09 10-57-44.csv', header = TRUE)
 PGdf2 <- read.csv(file = 'raw/gps/post/PinPoint 80379 2020-11-09 13-05-18.csv', header = TRUE)
-# PGdf3 <- read.csv(file = 'raw/gps/post/PinPoint 80380 2020-11-09 13-18-22.csv', header = TRUE)
-# PGdf4 <- read.csv(file = 'raw/gps/post/PinPoint 80381 2020-11-09 13-48-25.csv', header = TRUE)
-# PGdf5 <- read.csv(file = 'raw/gps/post/PinPoint 80382 2020-11-09 12-11-25.csv', header = TRUE)
-# PGdf6 <- read.csv(file = 'raw/gps/post/PinPoint 80383 2020-11-09 11-31-51.csv', header = TRUE)
-# PGdf7 <- read.csv(file = 'raw/gps/post/PinPoint 80384 2020-11-05 15-35-36.csv', header = TRUE)
-# PGdf8 <- read.csv(file = 'raw/gps/post/PinPoint 80385 2020-11-05 13-28-27.csv', header = TRUE)
-# PGdf9 <- read.csv(file = 'raw/gps/post/PinPoint 80386 2020-11-09 15-35-23.csv', header = TRUE)
-# PGdf10 <- read.csv(file = 'raw/gps/post/PinPoint 80387 2020-11-09 11-45-02.csv', header = TRUE)
-# PGdf11 <- read.csv(file = 'raw/gps/post/PinPoint 80388 2020-11-09 14-28-51.csv', header = TRUE)
-# PGdf12 <- read.csv(file = 'raw/gps/post/PinPoint 80389 2020-11-09 10-05-18.csv', header = TRUE)
-# PGdf13 <- read.csv(file = 'raw/gps/post/PinPoint 80390 2020-11-05 14-37-10.csv', header = TRUE)
-# PGdf14 <- read.csv(file = 'raw/gps/post/PinPoint 80391 2020-11-09 12-39-21.csv', header = TRUE)
-# 
+PGdf3 <- read.csv(file = 'raw/gps/post/PinPoint 80380 2020-11-09 13-18-22.csv', header = TRUE)
+PGdf4 <- read.csv(file = 'raw/gps/post/PinPoint 80381 2020-11-09 13-48-25.csv', header = TRUE)
+PGdf5 <- read.csv(file = 'raw/gps/post/PinPoint 80382 2020-11-09 12-11-25.csv', header = TRUE)
+PGdf6 <- read.csv(file = 'raw/gps/post/PinPoint 80383 2020-11-09 11-31-51.csv', header = TRUE)
+PGdf7 <- read.csv(file = 'raw/gps/post/PinPoint 80384 2020-11-05 15-35-36.csv', header = TRUE)
+PGdf8 <- read.csv(file = 'raw/gps/post/PinPoint 80385 2020-11-05 13-28-27.csv', header = TRUE)
+PGdf9 <- read.csv(file = 'raw/gps/post/PinPoint 80386 2020-11-09 15-35-23.csv', header = TRUE)
+PGdf10 <- read.csv(file = 'raw/gps/post/PinPoint 80387 2020-11-09 11-45-02.csv', header = TRUE)
+PGdf11 <- read.csv(file = 'raw/gps/post/PinPoint 80388 2020-11-09 14-28-51.csv', header = TRUE)
+PGdf12 <- read.csv(file = 'raw/gps/post/PinPoint 80389 2020-11-09 10-05-18.csv', header = TRUE)
+PGdf13 <- read.csv(file = 'raw/gps/post/PinPoint 80390 2020-11-05 14-37-10.csv', header = TRUE)
+PGdf14 <- read.csv(file = 'raw/gps/post/PinPoint 80391 2020-11-09 12-39-21.csv', header = TRUE)
+
 #Calling MST Conversion Functions ----
 PGdf1 <- mstConversion(PGdf1)
-# PGdf2 <- mstConversion(PGdf2)
-# PGdf3 <- mstConversion(PGdf3)
-# PGdf4 <- mstConversion(PGdf4)
-# PGdf5 <- mstConversion(PGdf5)
-# PGdf6 <- mstConversion(PGdf6)
-# PGdf7 <- mstConversion(PGdf7)
-# PGdf8 <- mstConversion(PGdf8)
-# PGdf9 <- mstConversion(PGdf9)
-# PGdf10 <- mstConversion(PGdf10)
-# PGdf11 <- mstConversion(PGdf11)
-# PGdf12 <- mstConversion(PGdf12)
-# PGdf13 <- mstConversion(PGdf13)
-# PGdf14 <- mstConversion(PGdf14)
+PGdf2 <- mstConversion(PGdf2)
+PGdf3 <- mstConversion(PGdf3)
+PGdf4 <- mstConversion(PGdf4)
+PGdf5 <- mstConversion(PGdf5)
+PGdf6 <- mstConversion(PGdf6)
+PGdf7 <- mstConversion(PGdf7)
+PGdf8 <- mstConversion(PGdf8)
+PGdf9 <- mstConversion(PGdf9)
+PGdf10 <- mstConversion(PGdf10)
+PGdf11 <- mstConversion(PGdf11)
+PGdf12 <- mstConversion(PGdf12)
+PGdf13 <- mstConversion(PGdf13)
+PGdf14 <- mstConversion(PGdf14)
 
 #Calling Analyze Fix Functions ----
- RPGdf1 <- analyzeFixes(PGdf1)
-# RPGdf2 <- analyzeFixes(PGdf2)
-# RPGdf3 <- analyzeFixes(PGdf3)
-# RPGdf4 <- analyzeFixes(PGdf4)
-# RPGdf5 <- analyzeFixes(PGdf5)
-# RPGdf6 <- analyzeFixes(PGdf6)
-# RPGdf7 <- analyzeFixes(PGdf7)
-# RPGdf8 <- analyzeFixes(PGdf8)
-# RPGdf9 <- analyzeFixes(PGdf9)
-# RPGdf10 <- analyzeFixes(PGdf10)
-# RPGdf11 <- analyzeFixes(PGdf11)
-# RPGdf12 <- analyzeFixes(PGdf12)
-# RPGdf13 <- analyzeFixes(PGdf13)
-# RPGdf14 <- analyzeFixes(PGdf14)
-# 
-# 
-# 
+RPGdf1 <- analyzeFixes(PGdf1)
+RPGdf2 <- analyzeFixes(PGdf2)
+RPGdf3 <- analyzeFixes(PGdf3)
+RPGdf4 <- analyzeFixes(PGdf4)
+RPGdf5 <- analyzeFixes(PGdf5)
+RPGdf6 <- analyzeFixes(PGdf6)
+RPGdf7 <- analyzeFixes(PGdf7)
+RPGdf8 <- analyzeFixes(PGdf8)
+RPGdf9 <- analyzeFixes(PGdf9)
+RPGdf10 <- analyzeFixes(PGdf10)
+RPGdf11 <- analyzeFixes(PGdf11)
+RPGdf12 <- analyzeFixes(PGdf12)
+RPGdf13 <- analyzeFixes(PGdf13)
+RPGdf14 <- analyzeFixes(PGdf14)
+
 #Data Output ----
-# write.csv(RPGdf1, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost1GPS.csv", row.names = FALSE)
-# write.csv(RPGdf2, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost2GPS.csv", row.names = FALSE)
-# write.csv(RPGdf3, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost3GPS.csv", row.names = FALSE)
-# write.csv(RPGdf4, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost4GPS.csv", row.names = FALSE)
-# write.csv(RPGdf5, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost5GPS.csv", row.names = FALSE)
-# write.csv(RPGdf6, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost6GPS.csv", row.names = FALSE)
-# write.csv(RPGdf7, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost7GPS.csv", row.names = FALSE)
-# write.csv(RPGdf8, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost8GPS.csv", row.names = FALSE)
-# write.csv(RPGdf9, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost9GPS.csv", row.names = FALSE)
-# write.csv(RPGdf10, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost10GPS.csv", row.names = FALSE)
-# write.csv(RPGdf11, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost11GPS.csv", row.names = FALSE)
-# write.csv(RPGdf12, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost12GPS.csv", row.names = FALSE)
-# write.csv(RPGdf13, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost13GPS.csv", row.names = FALSE)
-# write.csv(RPGdf14, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost14GPS.csv", row.names = FALSE)
+write.csv(RPGdf1, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost1GPS.csv", row.names = FALSE)
+write.csv(RPGdf2, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost2GPS.csv", row.names = FALSE)
+write.csv(RPGdf3, "F:/Development/Projects/Research/TeamBeef/workingProjectvoutput/APost3GPS.csv", row.names = FALSE)
+write.csv(RPGdf4, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost4GPS.csv", row.names = FALSE)
+write.csv(RPGdf5, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost5GPS.csv", row.names = FALSE)
+write.csv(RPGdf6, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost6GPS.csv", row.names = FALSE)
+write.csv(RPGdf7, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost7GPS.csv", row.names = FALSE)
+write.csv(RPGdf8, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost8GPS.csv", row.names = FALSE)
+write.csv(RPGdf9, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost9GPS.csv", row.names = FALSE)
+write.csv(RPGdf10, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost10GPS.csv", row.names = FALSE)
+write.csv(RPGdf11, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost11GPS.csv", row.names = FALSE)
+write.csv(RPGdf12, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost12GPS.csv", row.names = FALSE)
+write.csv(RPGdf13, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost13GPS.csv", row.names = FALSE)
+write.csv(RPGdf14, "F:/Development/Projects/Research/TeamBeef/workingProject/output/APost14GPS.csv", row.names = FALSE)
 
 
 #Working Tests Distance----
@@ -97,29 +95,30 @@ PGdf1 <- mstConversion(PGdf1)
 # yot <- filter(tempData, Fix %in% c("GPS Schedule"))
 # 
 # #Testing Functions ----
-tempData <- subset(PGdf1, date(GMT) == date(GMT) == as.Date("2020-08-09"))
+#tempData <- PGdf1[PGdf1$Fix == "GPS Schedule", ]
+# #  "Proximity GPS Schedule")
+# for(i in 2:nrow(tempData)) {
+#   speed <- speedFromGPS(tempData[i-1,], tempData[i,])
 # 
-for(i in 2:nrow(tempData)) {
-  speed <- speedFromGPS(tempData[i-1,], tempData[i,])
-
-  print(speed)
-}
-#   
-# tempData <- mstConversion(tempData)
- test <- analyzeFixes(tempData)
-# tempData <- tempData
-# 
-# 
-# #testing why inf speed, if can't figure out will just set to 0 
-# speedFromGPS(tempData[169,], tempData[170,])
-# 
-# yot <- TRUE
+#   print(speed)
+# }
+# #   
+# # tempData <- mstConversion(tempData)
+#  test <- analyzeFixes(tempData)
+# # tempData <- tempData
+# # 
+# # 
+# # #testing why inf speed, if can't figure out will just set to 0 
+# # speedFromGPS(tempData[169,], tempData[170,])
+# # 
+# # yot <- TRUE
 
 #Functions ----
 
 mstConversion <- function(data)
 {
   #remove if wanted to analyze Schedulde and Proximity together, will remove when fixed up. 
+  data <- data[data$Fix == "GPS Schedule", ]
   
   tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
   tempData  <- with_tz(tempDate, "America/Edmonton")
@@ -210,7 +209,7 @@ indexCopyFrame6 <- function(dataInput, index)
 analyzeFixes <- function(data)
 {
   #2020-07-13 for pre/post switch over 2020-06-18
-  dates <- seq(as.Date("2020-06-18"), as.Date("2020-09-16"), by="days")
+  dates <- seq(as.Date("2020-07-13"), as.Date("2020-09-16"), by="days")
   
   copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
                           No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), Avg_Speed_Day=numeric(0),
