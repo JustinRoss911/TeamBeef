@@ -7,26 +7,81 @@ library(tidyverse)
 #library(readr)
 library(lubridate)
 #library(geosphere)
+library(EnvStats)
+library(DMwR)
 
 #to remove all variables when needed
 #rm(list=ls())
 
 #Loading Data ----
+#Developed function to load in data 
+df1 <- acclPrep("1 ")
+df2 <- acclPrep("2 ")
+df3 <- acclPrep("3 ")
+df4 <- acclPrep("4 ")
+df5 <- acclPrep("5 ")
+df6 <- acclPrep("6 ")
+df7 <- acclPrep("7 ")
+df8 <- acclPrep("8 ")
+df9 <- acclPrep("9 ")
+df10 <- acclPrep("10")
+df11 <- acclPrep("11")
+df12 <- acclPrep("12")
+df13 <- acclPrep("13")
+df14 <- acclPrep("14")
+
+#Working Test ----
 
 #subset works super nicely 
 #what think will do, is run the same for loop over the date intervals to develop the data 
 #will then look to  have the subsetted data for the features that we are curious in searching for
-test <- acclPrep("11")
-newTest <- subset(test, date(GMT) == as.Date("2020-07-27")) 
-newTest <- newTest %>% select(sum)
+test <- acclPrep("1 ")
+newTest <- subset(test, date(GMT) == dates[1]) 
+
+test2 <- df[df$SUM > upper_bound,]
+test3 <- df[df$SUM >z | df$SUM <z1,]
+
+newTest <- df %>% select(SUM)
 #this provides teh magnitude of forces
 df <- transform(test, SUM = sqrt(X*X + Y*Y + Z*Z))
 
 df <- transform(test, test = newTest)
 
-date(df$GMT[1]) == as.Date("2020-07-12")
+test <- df(df$GMT) == as.Date("2020-07-12")
 
 max(df$sum)
+
+#Testing Viz for Outlier Detection
+ggplot(test) +
+  aes(x = "", y = SUM) +
+  geom_boxplot(fill = "#0c4c8a") +
+  theme_minimal()
+
+#Stats Test Test ----
+lower_bound <- quantile(df$SUM, 0.0005)
+upper_bound <- quantile(df$SUM, 0.9995)
+
+lower_bound <- median(df$SUM) - 3 * mad(df$SUM, constant = 1)
+
+
+test <- grubbs.test(df$SUM)
+
+
+test <- rosnerTest(df$SUM,
+                   k = 1000
+)
+test
+
+outliers <- boxplot(df$SUM, plot=FALSE)$out
+
+lofactor(df$SUM, 10)
+
+#Jackson Thinking Tests
+testLength <- boxplot.stats(df$SUM)$out
+length(testLength)
+
+testRos <- rosnerTest(df$SUM, k = floor(sqrt(length(testLength))))
+testView <- testRos$all.stats$Value
 
 #Functions ----
 mstConversion <- function(data)
@@ -281,5 +336,28 @@ acclPrep <- function(index)
   data$Y <- data$Y * 0.31392 
   data$Z <- data$Z * 0.31392 
   
+  data <- transform(data, SUM = sqrt(X*X + Y*Y + Z*Z))
+ #data <- transform(data, SUM_RES = SUM - mean(SUM))
+  
   return(data)
+}
+
+analyzeAccl <- function(data)
+{
+  #2020-07-13 for pre/post switch over
+  dates <- seq(as.Date("2020-06-18"), as.Date("2020-09-16"), by="days")
+  
+  copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
+                          No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), 
+                          Per_No_Fix=character(0), Per_Missing_Fix=character(0))
+  
+  
+  
+  for(i in 1:length(dates))
+  {
+    
+  }
+  
+  colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
+  return(copyFrame)
 }
