@@ -64,7 +64,7 @@ RPGdf14 <- analyzeFixes(PGdf14)
 #Data Output ----
 write.csv(RPGdf1, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost1GPS.csv", row.names = FALSE)
 write.csv(RPGdf2, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost2GPS.csv", row.names = FALSE)
-write.csv(RPGdf3, "F:/Development/Projects/Research/TeamBeef/workingProjectvoutput/post/APost3GPS.csv", row.names = FALSE)
+write.csv(RPGdf3, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost3GPS.csv", row.names = FALSE)
 write.csv(RPGdf4, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost4GPS.csv", row.names = FALSE)
 write.csv(RPGdf5, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost5GPS.csv", row.names = FALSE)
 write.csv(RPGdf6, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost6GPS.csv", row.names = FALSE)
