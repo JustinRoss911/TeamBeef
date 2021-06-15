@@ -13,98 +13,117 @@ library(geosphere)
 
 
 #Data Loading ----
-PGdf1 <- read.csv(file = 'Data/GPS/PinPoint 80378 2020-11-09 10-57-44.csv', header = TRUE)
-PGdf2 <- read.csv(file = 'Data/GPS/PinPoint 80379 2020-11-09 13-05-18.csv', header = TRUE)
-# PGdf3 <- read.csv(file = 'Data/GPS/PinPoint 80380 2020-11-09 13-18-22.csv', header = TRUE)
-# PGdf4 <- read.csv(file = 'Data/GPS/PinPoint 80381 2020-11-09 13-48-25.csv', header = TRUE)
-# PGdf5 <- read.csv(file = 'Data/GPS/PinPoint 80382 2020-11-09 12-11-25.csv', header = TRUE)
-# PGdf6 <- read.csv(file = 'Data/GPS/PinPoint 80383 2020-11-09 11-31-51.csv', header = TRUE)
-# PGdf7 <- read.csv(file = 'Data/GPS/PinPoint 80384 2020-11-05 15-35-36.csv', header = TRUE)
-# PGdf8 <- read.csv(file = 'Data/GPS/PinPoint 80385 2020-11-05 13-28-27.csv', header = TRUE)
-# PGdf9 <- read.csv(file = 'Data/GPS/PinPoint 80386 2020-11-09 15-35-23.csv', header = TRUE)
-# PGdf10 <- read.csv(file = 'Data/GPS/PinPoint 80387 2020-11-09 11-45-02.csv', header = TRUE)
-# PGdf11 <- read.csv(file = 'Data/GPS/PinPoint 80388 2020-11-09 14-28-51.csv', header = TRUE)
-# PGdf12 <- read.csv(file = 'Data/GPS/PinPoint 80389 2020-11-09 10-05-18.csv', header = TRUE)
-# PGdf13 <- read.csv(file = 'Data/GPS/PinPoint 80390 2020-11-05 14-37-10.csv', header = TRUE)
-# PGdf14 <- read.csv(file = 'Data/GPS/PinPoint 80391 2020-11-09 12-39-21.csv', header = TRUE)
+PGdf1 <- read.csv(file = 'raw/gps/post/PinPoint 80378 2020-11-09 10-57-44.csv', header = TRUE)
+PGdf2 <- read.csv(file = 'raw/gps/post/PinPoint 80379 2020-11-09 13-05-18.csv', header = TRUE)
+# PGdf3 <- read.csv(file = 'raw/gps/post/PinPoint 80380 2020-11-09 13-18-22.csv', header = TRUE)
+# PGdf4 <- read.csv(file = 'raw/gps/post/PinPoint 80381 2020-11-09 13-48-25.csv', header = TRUE)
+# PGdf5 <- read.csv(file = 'raw/gps/post/PinPoint 80382 2020-11-09 12-11-25.csv', header = TRUE)
+# PGdf6 <- read.csv(file = 'raw/gps/post/PinPoint 80383 2020-11-09 11-31-51.csv', header = TRUE)
+# PGdf7 <- read.csv(file = 'raw/gps/post/PinPoint 80384 2020-11-05 15-35-36.csv', header = TRUE)
+# PGdf8 <- read.csv(file = 'raw/gps/post/PinPoint 80385 2020-11-05 13-28-27.csv', header = TRUE)
+# PGdf9 <- read.csv(file = 'raw/gps/post/PinPoint 80386 2020-11-09 15-35-23.csv', header = TRUE)
+# PGdf10 <- read.csv(file = 'raw/gps/post/PinPoint 80387 2020-11-09 11-45-02.csv', header = TRUE)
+# PGdf11 <- read.csv(file = 'raw/gps/post/PinPoint 80388 2020-11-09 14-28-51.csv', header = TRUE)
+# PGdf12 <- read.csv(file = 'raw/gps/post/PinPoint 80389 2020-11-09 10-05-18.csv', header = TRUE)
+# PGdf13 <- read.csv(file = 'raw/gps/post/PinPoint 80390 2020-11-05 14-37-10.csv', header = TRUE)
+# PGdf14 <- read.csv(file = 'raw/gps/post/PinPoint 80391 2020-11-09 12-39-21.csv', header = TRUE)
 # 
-#Calling Functions ----
-# PGdf1 <- mstConversion(df1)
-# PGdf2 <- mstConversion(df2)
-# PGdf3 <- mstConversion(df3)
-# PGdf4 <- mstConversion(df4)
-# PGdf5 <- mstConversion(df5)
-# PGdf6 <- mstConversion(df6)
-# PGdf7 <- mstConversion(df7)
-# PGdf8 <- mstConversion(df8)
-# PGdf9 <- mstConversion(df9)
-# PGdf10 <- mstConversion(df10)
-# PGdf11 <- mstConversion(df11)
-# PGdf12 <- mstConversion(df12)
-# PGdf13 <- mstConversion(df13)
-# PGdf14 <- mstConversion(df14)
-# 
-# PGdf1 <- analyzeFixes(df1)
-# PGdf2 <- analyzeFixes(df2)
-# PGdf3 <- analyzeFixes(df3)
-# PGdf4 <- analyzeFixes(df4)
-# PGdf5 <- analyzeFixes(df5)
-# PGdf6 <- analyzeFixes(df6)
-# PGdf7 <- analyzeFixes(df7)
-# PGdf8 <- analyzeFixes(df8)
-# PGdf9 <- analyzeFixes(df9)
-# PGdf10 <- analyzeFixes(df10)
-# PGdf11 <- analyzeFixes(df11)
-# PGdf12 <- analyzeFixes(df12)
-# PGdf13 <- analyzeFixes(df13)
-# PGdf14 <- analyzeFixes(df14)
+#Calling MST Conversion Functions ----
+PGdf1 <- mstConversion(PGdf1)
+# PGdf2 <- mstConversion(PGdf2)
+# PGdf3 <- mstConversion(PGdf3)
+# PGdf4 <- mstConversion(PGdf4)
+# PGdf5 <- mstConversion(PGdf5)
+# PGdf6 <- mstConversion(PGdf6)
+# PGdf7 <- mstConversion(PGdf7)
+# PGdf8 <- mstConversion(PGdf8)
+# PGdf9 <- mstConversion(PGdf9)
+# PGdf10 <- mstConversion(PGdf10)
+# PGdf11 <- mstConversion(PGdf11)
+# PGdf12 <- mstConversion(PGdf12)
+# PGdf13 <- mstConversion(PGdf13)
+# PGdf14 <- mstConversion(PGdf14)
+
+#Calling Analyze Fix Functions ----
+ RPGdf1 <- analyzeFixes(PGdf1)
+# RPGdf2 <- analyzeFixes(PGdf2)
+# RPGdf3 <- analyzeFixes(PGdf3)
+# RPGdf4 <- analyzeFixes(PGdf4)
+# RPGdf5 <- analyzeFixes(PGdf5)
+# RPGdf6 <- analyzeFixes(PGdf6)
+# RPGdf7 <- analyzeFixes(PGdf7)
+# RPGdf8 <- analyzeFixes(PGdf8)
+# RPGdf9 <- analyzeFixes(PGdf9)
+# RPGdf10 <- analyzeFixes(PGdf10)
+# RPGdf11 <- analyzeFixes(PGdf11)
+# RPGdf12 <- analyzeFixes(PGdf12)
+# RPGdf13 <- analyzeFixes(PGdf13)
+# RPGdf14 <- analyzeFixes(PGdf14)
 # 
 # 
 # 
 #Data Output ----
-# write.csv(PGdf1, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post1GPS.csv", row.names = FALSE)
-# write.csv(PGdf2, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post2GPS.csv", row.names = FALSE)
-# write.csv(PGdf3, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post3GPS.csv", row.names = FALSE)
-# write.csv(PGdf4, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post4GPS.csv", row.names = FALSE)
-# write.csv(PGdf5, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post5GPS.csv", row.names = FALSE)
-# write.csv(PGdf6, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post6GPS.csv", row.names = FALSE)
-# write.csv(PGdf7, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post7GPS.csv", row.names = FALSE)
-# write.csv(PGdf8, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post8GPS.csv", row.names = FALSE)
-# write.csv(PGdf9, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post9GPS.csv", row.names = FALSE)
-# write.csv(PGdf10, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post10GPS.csv", row.names = FALSE)
-# write.csv(PGdf11, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post11GPS.csv", row.names = FALSE)
-# write.csv(PGdf12, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post12GPS.csv", row.names = FALSE)
-# write.csv(PGdf13, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post13GPS.csv", row.names = FALSE)
-# write.csv(PGdf14, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\Post14GPS.csv", row.names = FALSE)
+# write.csv(RPGdf1, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost1GPS.csv", row.names = FALSE)
+# write.csv(RPGdf2, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost2GPS.csv", row.names = FALSE)
+# write.csv(RPGdf3, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost3GPS.csv", row.names = FALSE)
+# write.csv(RPGdf4, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost4GPS.csv", row.names = FALSE)
+# write.csv(RPGdf5, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost5GPS.csv", row.names = FALSE)
+# write.csv(RPGdf6, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost6GPS.csv", row.names = FALSE)
+# write.csv(RPGdf7, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost7GPS.csv", row.names = FALSE)
+# write.csv(RPGdf8, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost8GPS.csv", row.names = FALSE)
+# write.csv(RPGdf9, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost9GPS.csv", row.names = FALSE)
+# write.csv(RPGdf10, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost10GPS.csv", row.names = FALSE)
+# write.csv(RPGdf11, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost11GPS.csv", row.names = FALSE)
+# write.csv(RPGdf12, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost12GPS.csv", row.names = FALSE)
+# write.csv(RPGdf13, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost13GPS.csv", row.names = FALSE)
+# write.csv(RPGdf14, "F:\\Development\\Projects\\Research\\TeamBeef\\workingProject\\output\\APost14GPS.csv", row.names = FALSE)
 
 
 #Working Tests Distance----
 
-testData <- read.csv(file = 'Data/GPS/testGPS.csv', header = TRUE)
-yot <- mstConversion(yot)
+# testData <- read.csv(file = 'Data/GPS/testGPS.csv', header = TRUE)
+# yot <- mstConversion(yot)
+# 
+# testGPS1 <- testData[90,]
+# testGPS2 <- testData[91,]
+# 
+# avgSpeed <- speedFromGPS(PGdf1[(142),], PGdf1[10000,])
+# 
+# 
+# new <- speedFromGPS(testGPS1, testGPS2)
+# 
+# #Working Test Proximity Selc
+# #need to extract before converting to MST 
+# yot <- filter(tempData, Fix %in% c("GPS Schedule"))
+# 
+# #Testing Functions ----
+tempData <- subset(PGdf1, date(GMT) == date(GMT) == as.Date("2020-08-09"))
+# 
+for(i in 2:nrow(tempData)) {
+  speed <- speedFromGPS(tempData[i-1,], tempData[i,])
 
-testGPS1 <- testData[90,]
-testGPS2 <- testData[91,]
-
-
-new <- speedFromGPS(testGPS1, testGPS2)
-
-#Working Test Proximity Selc
-#need to extract before converting to MST 
-yot <- filter(testData, Fix %in% c("GPS Schedule"))
-
-#Testing Functions ----
-
-
-yot <- TRUE
+  print(speed)
+}
+#   
+# tempData <- mstConversion(tempData)
+ test <- analyzeFixes(tempData)
+# tempData <- tempData
+# 
+# 
+# #testing why inf speed, if can't figure out will just set to 0 
+# speedFromGPS(tempData[169,], tempData[170,])
+# 
+# yot <- TRUE
 
 #Functions ----
 
 mstConversion <- function(data)
 {
+  #remove if wanted to analyze Schedulde and Proximity together, will remove when fixed up. 
+  
   tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
   tempData  <- with_tz(tempDate, "America/Edmonton")
-  data$MST <- tempData 
+  data$GMT <- tempData 
   
   return(data)  
 }
@@ -190,60 +209,123 @@ indexCopyFrame6 <- function(dataInput, index)
 
 analyzeFixes <- function(data)
 {
-  #2020-07-13 for pre/post switch over
+  #2020-07-13 for pre/post switch over 2020-06-18
   dates <- seq(as.Date("2020-06-18"), as.Date("2020-09-16"), by="days")
   
   copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
-                          No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), 
-                          Per_No_Fix=character(0), Per_Missing_Fix=character(0))
+                          No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), Avg_Speed_Day=numeric(0),
+                          Avg_Speed_Night=numeric(0), Out_of_Bounds=numeric(0), Per_No_Fix=character(0), Per_Missing_Fix=character(0))
   
   
   
   for(i in 1:length(dates))
   {
     dateCounter <- 0
+    
     noFix <- 0 
     lateFix <- 0 
     earlyFix <- 0 
     Fix <- 0 
-    expFix <- 0 
+    
     differenceTime <- 0 
     firstCheck <- TRUE 
     dateStart <- 0 
     dateEnd <- 0 
+    
     perNo <- 0
     perMiss <- 0 
     expectedFix <- 0 
     
+    avgSpeedDay <- 0
+    avgSpeedNight <- 0
+    speedcounterD <- 0
+    speedcounterN <- 0
+    speedEvent <- TRUE
+    outOfBounds <- 0
+    
+    day <- FALSE
+    night <- FALSE
+    
     for(j in 2:(nrow(data)-1))
     {
-      if(as.Date(data$MST[j]) == dates[i]) { #same day
+      if(as.Date(data$GMT[j]) == dates[i]) { #same day
         
-        differenceTime <- as.numeric((data$MST[j] - data$MST[j - 1]), units ="mins")
+        differenceTime <- as.numeric((data$GMT[j] - data$GMT[j - 1]), units ="mins")
+        speedCheck <- speedFromGPS(data[(j-1),], data[j,])
+        
+        if(speedCheck > 10)
+          speedEvent <- FALSE
+        
+        daytime <- format(data$GMT[j], format = "%H")
+
+        if(daytime == "06") {
+          day <- TRUE
+          night <- FALSE
+        }
+        else if(daytime == "20") {
+          night <- TRUE
+          day <- FALSE
+        }
         
         if(data$Latitude[j] == 0 | data$Longitude[j] == 0 | data$Altitude[j] == 0) {
           noFix <- noFix + 1
         }
         
-        else if(3 < differenceTime && differenceTime < 7) { #fix
+        else if(3 < differenceTime && differenceTime < 7 & speedEvent) { #fix
           Fix <- Fix + 1
+          
+          if(day) {
+          avgSpeedDay <- avgSpeedDay + speedFromGPS(data[(j-1),], data[j,])
+          speedcounterD <- speedcounterD + 1
+          }
+          else if(night) {
+          avgSpeedNight <- avgSpeedNight + speedFromGPS(data[(j-1),], data[j,])
+          speedcounterN <- speedcounterN + 1         
+          }
+          
         }
         
-        else if(3 >= differenceTime) { #early
+        else if(3 >= differenceTime & speedEvent) { #early
           earlyFix <- earlyFix + 1
+          
+          if(day) {
+            avgSpeedDay <- avgSpeedDay + speedFromGPS(data[(j-1),], data[j,])
+            speedcounterD <- speedcounterD + 1
+          }
+          else if(night) {
+            avgSpeedNight <- avgSpeedNight + speedFromGPS(data[(j-1),], data[j,])
+            speedcounterN <- speedcounterN + 1         
+          }
+          
         }
         
-        else if(differenceTime <= 7) { #late
+        else if(differenceTime <= 7 & speedEvent) { #late
           lateFix <- lateFix + 1
+          
+          if(day) {
+            avgSpeedDay <- avgSpeedDay + speedFromGPS(data[(j-1),], data[j,])
+            speedcounterD <- speedcounterD + 1
+          }
+          else if(night) {
+            avgSpeedNight <- avgSpeedNight + speedFromGPS(data[(j-1),], data[j,])
+            speedcounterN <- speedcounterN + 1         
+          }
+          
         }
+        
+        else if(!speedEvent) {
+          outOfBounds <- outOfBounds + 1
+          speedEvent <- TRUE
+        }
+        
         
         if(firstCheck) {  #first
-          dateStart <- data$MST[j]
+          dateStart <- data$GMT[j]
           firstCheck <- FALSE
         }
         
         else if(TRUE) { #last
-          dateEnd <- data$MST[j]
+          dateEnd <- data$GMT[j]
         }
         
         dateCounter <- dateCounter + 1
@@ -255,7 +337,7 @@ analyzeFixes <- function(data)
     
     
     if(dateCounter == 0) {
-      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, perNo, perMiss)
+      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, avgSpeedDay, avgSpeedNight, outOfBounds, perNo, perMiss)
       copyFrame <- rbind(copyFrame, holdFrame)
     }
     
@@ -278,15 +360,18 @@ analyzeFixes <- function(data)
       
       perMiss <- ((expectedFix - (lateFix + earlyFix + Fix)) / expectedFix) * 100 
       perMiss <- paste(perMiss, "%")
-      
-      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, perNo, perMiss)
+
+      avgSpeedDay <- avgSpeedDay / speedcounterD
+      avgSpeedNight <- avgSpeedNight / speedcounterN
+
+      holdFrame <- data.frame(rowDate, expectedFix, Fix, noFix, earlyFix, lateFix, avgSpeedDay, avgSpeedNight, outOfBounds, perNo, perMiss)
       copyFrame <- rbind(copyFrame, holdFrame)
     }
     
     
   }
   
-  colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
+  colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Avg_Speed_Day", "Avg_Speed_Night", "Out_of_Bounds", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
   return(copyFrame)
 }
 
@@ -300,9 +385,12 @@ speedFromGPS <- function(p1, p2)
   
   distance <- distGeo(p1GPS, p2GPS)
   
-  time <- as.numeric((p1$GMT - p2$GMT), units ="secs")
-  
-  speed <- distance / differenceTime
+  time <- as.numeric((p2$GMT - p1$GMT), units ="secs")
+
+  speed <- abs(distance / time)
+
+  if(speed == Inf)
+    speed <- 0 
   
   return(speed)
 }
