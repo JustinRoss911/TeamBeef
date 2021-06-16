@@ -395,7 +395,7 @@ analyzeAccl <- function(data)
   
   copyFrame <- data.frame(Dates=character(0), Per_Exp=numeric(0), Per_95_Ac=numeric(0), Per_99_Ac=numeric(0), Per_99_H=numeric(0))
   
-  lower_bound95 <- quantile(data()$SUM, 0.025)
+  lower_bound95 <- quantile(data$SUM, 0.025)
   upper_bound95 <- quantile(data$SUM, 0.975)
   
   lower_bound99 <- quantile(data$SUM, 0.005)
@@ -423,9 +423,9 @@ analyzeAccl <- function(data)
       perExpTotal <- nrow(dataDay)
       perExp <- perExpTotal / (86400/2)
       
-      per95 <- length(dataDay[(dataDay$SUM <= lower_bound95) | (dataDay$SUM >= upper_bound95),]) / perExpTotal
-      per99 <- length(dataDay[(dataDay$SUM <= lower_bound99) | (dataDay$SUM >= upper_bound99),]) / perExpTotal
-      per99H <- length(dataDay[(dataDay$SUM >= upper_bound99H),]) / perExpTotal
+      per95 <- nrow(dataDay[(dataDay$SUM <= lower_bound95) | (dataDay$SUM >= upper_bound95),]) / perExpTotal
+      per99 <- nrow(dataDay[(dataDay$SUM <= lower_bound99) | (dataDay$SUM >= upper_bound99),]) / perExpTotal
+      per99H <- nrow(dataDay[(dataDay$SUM >= upper_bound99H),]) / perExpTotal
       
       holdFrame <- data.frame(rowDate, perExp, per95, per99, per99H)
       copyFrame <- rbind(copyFrame, holdFrame)
