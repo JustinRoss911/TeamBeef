@@ -41,10 +41,27 @@ df6$Y <- df6$Y * 0.31392
 df6$Z <- df6$Z * 0.31392 
 
 df6 <- transform(df6, SUM = sqrt(X*X + Y*Y + Z*Z))
-testData <- df6
-testData <- testData[date(testData$GMT)]
+testData <- df12
+testData <- testData[date(testData$GMT) == "2020-07-13", ]
 #omit since only has X, Y data
 #df3 <- acclPrep()
+
+#Clean Run ----
+
+Rdf1 <- analyzeAccl(df1)
+Rdf2 <- analyzeAccl(df2)
+Rdf3 <- analyzeAccl(df3)
+Rdf4 <- analyzeAccl(df4)
+Rdf5 <- analyzeAccl(df5)
+Rdf6 <- analyzeAccl(df6)
+Rdf7 <- analyzeAccl(df7)
+Rdf8 <- analyzeAccl(df8)
+Rdf9 <- analyzeAccl(df9)
+Rdf10 <- analyzeAccl(df10)
+Rdf11 <- analyzeAccl(df11)
+Rdf12 <- analyzeAccl(df12)
+Rdf13 <- analyzeAccl(df13)
+Rdf14 <- analyzeAccl(df14)
 
 #Working Test ----
 
@@ -378,14 +395,49 @@ analyzeAccl <- function(data)
   
   copyFrame <- data.frame(Dates=character(0), Per_Exp=numeric(0), Per_95_Ac=numeric(0), Per_99_Ac=numeric(0), Per_99_H=numeric(0))
   
-   
+  lower_bound95 <- quantile(data()$SUM, 0.025)
+  upper_bound95 <- quantile(data$SUM, 0.975)
   
-
+  lower_bound99 <- quantile(data$SUM, 0.005)
+  upper_bound99 <- quantile(data$SUM, 0.995)
+  
+  upper_bound99H <- quantile(data$SUM, 0.9995)
+  
   for(i in 1:length(dates))
   {
+    perExp <- 0 
+    per95 <- 0 
+    per99 <- 0
+    per99H <- 0 
+    rowDate <- as.character(dates[i])
+    #collar <- "Unknown"
     
+    dataDay <- data[date(data$GMT) == dates[i], ]
+    
+    
+    if(nrow(dataDay) == 0) {
+      holdFrame <- data.frame(rowDate, perExp, per95, per99, per99H)
+      copyFrame <- rbind(copyFrame, holdFrame)
+    }
+    else {
+      perExpTotal <- nrow(dataDay)
+      perExp <- perExpTotal / (86400/2)
+      
+      per95 <- length(dataDay[(dataDay$SUM <= lower_bound95) | (dataDay$SUM >= upper_bound95),]) / perExpTotal
+      per99 <- length(dataDay[(dataDay$SUM <= lower_bound99) | (dataDay$SUM >= upper_bound99),]) / perExpTotal
+      per99H <- length(dataDay[(dataDay$SUM >= upper_bound99H),]) / perExpTotal
+      
+      holdFrame <- data.frame(rowDate, perExp, per95, per99, per99H)
+      copyFrame <- rbind(copyFrame, holdFrame)
+    }
+    
+
   }
+    
+  
+  
   
   colnames(copyFrame) <- c("Date", "Percent Expected Recordings", "95 Percentile Activities", "99 Percentile Activities", '99.99 Percentile High Activities')
   return(copyFrame)
 }
+
