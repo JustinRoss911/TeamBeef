@@ -134,7 +134,8 @@ for(i in 1:14)
     }
     else if(nrow(verifyingID) == nrow(checkingID)) {
       holdFrame <- verifyingID %>% select(StartNum, StopNum)
-      holdFrame <- verifyingID - checkingID
+      checkFrame <- checkingID %>% select(StartNum, StopNum)
+      holdFrame <- holdFrame - checkFrame
       holdFrame <- transform(holdFrame, ID = ID_Vec[i], Proximity = ID_Vec[j])
       
       copyFrame <- rbind(copyFrame, holdFrame)
@@ -148,6 +149,28 @@ for(i in 1:14)
 }
 
 
+
+#Clean Test ----
+df1 <- proxPrep("1.", 30378)
+df2 <- proxPrep("2.", 30379)
+df3 <- proxPrep("3.", 30380)
+df4 <- proxPrep("4.", 30381)
+df5 <- proxPrep("5.", 30382)
+df6 <- proxPrep("6.", 30383)
+df7 <- proxPrep("7.", 30384)
+df8 <- proxPrep("8.", 30385)
+df9 <- proxPrep("9.", 30386)
+df10 <- proxPrep("10", 30387)
+df11 <- proxPrep("11", 30388)
+df12 <- proxPrep("12", 30389)
+df13 <- proxPrep("13", 30390)
+df14 <- proxPrep("14", 30391)
+
+
+df <- rbind(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12, df13, df14)
+testResult <- proxCheck(df)
+
+write.csv(testResult, "F:/Development/Projects/Research/TeamBeef/workingProject/output/pre/PreProxResult.csv", row.names = FALSE)
 
 #Functions ----
 mstConversion <- function(data)
@@ -443,3 +466,45 @@ proxPrep <- function(index, inputID)
   return(data)
 }
 
+proxCheck <- function(data)
+{
+  ID_Vec <- c(30378,30379,30380,30381,30382,30383,30384,30385,30386,30387,30388,30389,30390,30391)
+  copyFrame <- data.frame(StartNum=numeric(0), StopNum=numeric(0), ID=numeric(0), Proximity=numeric(0))
+  
+  for(i in 1:14)
+  {
+    checkingID <- data[data$ID == ID_Vec[i],]
+
+    for(j in i:14)
+    {
+      checkFrame <- data[(data$ID == ID_Vec[i]) & (data$Proximity == ID_Vec[j]), ]
+      verifyingID <- data[(data$ID == ID_Vec[j]) & (data$Proximity == ID_Vec[i]), ]
+
+      if(is.na(verifyingID$ID[1] == checkingID$ID[1])) {
+      #  holdFrame <- c(NA, NA, ID_Vec[i], ID_Vec[j])
+      # copyFrame <- rbind(copyFrame, holdFrame)
+        copyFrame[nrow(copyFrame) + 1,] <- NA
+      }
+      else if(verifyingID$ID[1] == checkingID$ID[1]) {
+      #  holdFrame <- c(NA, NA, ID_Vec[i], ID_Vec[j])
+      #  copyFrame <- rbind(copyFrame, holdFrame)
+        copyFrame[nrow(copyFrame) + 1,] <- NA
+      }
+      else if(nrow(verifyingID) == nrow(checkFrame)) {
+        holdFrame <- verifyingID %>% select(StartNum, StopNum)
+        checkFrameSub <- checkFrame %>% select(StartNum, StopNum)
+        holdFrame <- holdFrame - checkFrameSub
+        holdFrame <- transform(holdFrame, ID = ID_Vec[i], Proximity = ID_Vec[j])
+        print(holdFrame)
+        print(copyFrame)
+        copyFrame <- rbind(copyFrame, holdFrame)
+      }
+      else {
+        copyFrame[nrow(copyFrame) + 1,] <- NA
+      }
+      
+    }
+    
+  }
+  return(copyFrame)
+}
