@@ -50,7 +50,6 @@ testData <- testData[date(testData$GMT) == "2020-07-13", ]
 
 Rdf1 <- analyzeAccl(df1)
 Rdf2 <- analyzeAccl(df2)
-Rdf3 <- analyzeAccl(df3)
 Rdf4 <- analyzeAccl(df4)
 Rdf5 <- analyzeAccl(df5)
 Rdf6 <- analyzeAccl(df6)
@@ -62,6 +61,22 @@ Rdf11 <- analyzeAccl(df11)
 Rdf12 <- analyzeAccl(df12)
 Rdf13 <- analyzeAccl(df13)
 Rdf14 <- analyzeAccl(df14)
+
+#Clean Printing ----
+write.csv(Rdf1, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost1Accl.csv", row.names = FALSE)
+write.csv(Rdf2, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost2Accl.csv", row.names = FALSE)
+write.csv(Rdf3, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost3Accl.csv", row.names = FALSE)
+write.csv(Rdf4, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost4Accl.csv", row.names = FALSE)
+write.csv(Rdf5, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost5Accl.csv", row.names = FALSE)
+write.csv(Rdf6, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost6Accl.csv", row.names = FALSE)
+write.csv(Rdf7, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost7Accl.csv", row.names = FALSE)
+write.csv(Rdf8, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost8Accl.csv", row.names = FALSE)
+write.csv(Rdf9, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost9Accl.csv", row.names = FALSE)
+write.csv(Rdf10, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost10Accl.csv", row.names = FALSE)
+write.csv(Rdf11, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost11Accl.csv", row.names = FALSE)
+write.csv(Rdf12, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost12Accl.csv", row.names = FALSE)
+write.csv(Rdf13, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost13Accl.csv", row.names = FALSE)
+write.csv(Rdf14, "F:/Development/Projects/Research/TeamBeef/workingProject/output/post/APost14Accl.csv", row.names = FALSE)
 
 #Working Test ----
 
@@ -434,7 +449,7 @@ analyzeAccl <- function(data)
 
   }
     
-  
+  #Need to add a first last day check and change the percent expected with that in mind, the calendar of events non hard-coded is needed for sure. 
   
   
   colnames(copyFrame) <- c("Date", "Percent Expected Recordings", "95 Percentile Activities", "99 Percentile Activities", '99.99 Percentile High Activities')
