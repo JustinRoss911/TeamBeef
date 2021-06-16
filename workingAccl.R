@@ -7,7 +7,7 @@ library(tidyverse)
 #library(readr)
 library(lubridate)
 #library(geosphere)
-library(EnvStats)
+library(outliers)
 library(DMwR)
 
 #to remove all variables when needed
@@ -36,10 +36,10 @@ df14 <- acclPrep("14")
 #what think will do, is run the same for loop over the date intervals to develop the data 
 #will then look to  have the subsetted data for the features that we are curious in searching for
 test <- acclPrep("1 ")
-newTest <- subset(test, date(GMT) == dates[1]) 
+newTest <- subset(test,  ye$statistic[1] < test$SUM | ye$statistic[2] > test$SUM) 
 
 test2 <- df[df$SUM > upper_bound,]
-test3 <- df[df$SUM >z | df$SUM <z1,]
+test3 <- df[ ye$statistic[1] < test$SUM]
 
 #this method will work well, can take this general idea to compare 
 df <- transform(df, Test1 = as.numeric(df$GMT))
@@ -63,22 +63,28 @@ ggplot(test) +
   geom_boxplot(fill = "#0c4c8a") +
   theme_minimal()
 
+qqnorm(df$SUM, pch = 1, frame = FALSE)
+
 #Stats Test Test ----
-lower_bound <- quantile(df$SUM, 0.0005)
-upper_bound <- quantile(df$SUM, 0.9995)
+lower_bound <- quantile(test$SUM, 0.0005)
+upper_bound <- quantile(test$SUM, 0.9995)
 
-lower_bound <- median(df$SUM) - 3 * mad(df$SUM, constant = 1)
+lower_bound <- quantile(test$SUM, 0.0005)
+upper_bound <- quantile(test$SUM, 0.9995)
+
+lower_bound <- quantile(test$SUM, 0.0005)
+upper_bound <- quantile(test$SUM, 0.9995)
+
+lower_bound <- median(test$SUM) - 3 * mad(test$SUM, constant = 1)
 
 
-test <- grubbs.test(df$SUM)
+ye <- grubbs.test(test$SUM)
 
 
-test <- rosnerTest(df$SUM,
-                   k = 1000
-)
+test <- rosnerTest(df$SUM, k = floor(sqrt(length(outliers))), alpha = 0.01)
 test
 
-outliers <- boxplot(df$SUM, plot=FALSE)$out
+outliers <- boxplot(test$SUM)$out
 
 lofactor(df$SUM, 10)
 
