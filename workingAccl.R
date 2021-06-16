@@ -8,8 +8,10 @@ library(tidyverse)
 library(lubridate)
 #library(geosphere)
 library(outliers)
-library(DMwR)
-
+library(signal)
+library(climtrends)
+install.packages('climtrends')
+install.packages('signal')
 #to remove all variables when needed
 #rm(list=ls())
 
@@ -46,6 +48,7 @@ df <- transform(df, Test1 = as.numeric(df$GMT))
 test4 <- df[df$Test1 > 1595500980, ]
 #how to handle GPS prox comparison is still being thought of
 
+trt <- butter(3, test$X)
 
 newTest <- df %>% select(SUM)
 #this provides teh magnitude of forces
@@ -364,12 +367,12 @@ analyzeAccl <- function(data)
                           Per_No_Fix=character(0), Per_Missing_Fix=character(0))
   
   
-  
+
   for(i in 1:length(dates))
   {
     
   }
   
-  colnames(copyFrame) <- c("Date", "Expected_Fixes", "On_Time_Fix", "No_fix", "Early_Fix", "Late_Fix", "Percent_No_Fix_to_Total", "Per_Missing__to_Expected_Fix")
+  colnames(copyFrame) <- c("Date" )
   return(copyFrame)
 }
