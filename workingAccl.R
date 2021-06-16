@@ -19,7 +19,7 @@ install.packages('signal')
 #Developed function to load in data 
 df1 <- acclPrep("1 ")
 df2 <- acclPrep("2 ")
-df3 <- acclPrep("3 ")
+#df3 <- acclPrep("3 ")
 df4 <- acclPrep("4 ")
 df5 <- acclPrep("5 ")
 df6 <- acclPrep("6 ")
@@ -31,6 +31,20 @@ df11 <- acclPrep("11")
 df12 <- acclPrep("12")
 df13 <- acclPrep("13")
 df14 <- acclPrep("14")
+
+#Loading 3, 6, 10
+df6 <- read.csv(file = 'raw/accl/post/PostAccl6.csv', header = TRUE)
+df6 <- mstConversion(df6)
+
+df6$X <- df6$X * 0.31392 
+df6$Y <- df6$Y * 0.31392 
+df6$Z <- df6$Z * 0.31392 
+
+df6 <- transform(df6, SUM = sqrt(X*X + Y*Y + Z*Z))
+testData <- df6
+testData <- testData[date(testData$GMT)]
+#omit since only has X, Y data
+#df3 <- acclPrep()
 
 #Working Test ----
 
@@ -332,9 +346,9 @@ acclPrep <- function(index)
       
       holdFrame <- read.csv(file = filePath, header = TRUE)
       
+      #cannot read a single file in its current itreation, will need to fix this
       if(counter == 0) {
         copyFrame <- holdFrame
-        
       }
       else {
         copyFrame <- rbind(copyFrame, holdFrame)
@@ -362,10 +376,9 @@ analyzeAccl <- function(data)
   #2020-07-13 for pre/post switch over
   dates <- seq(as.Date("2020-06-18"), as.Date("2020-09-16"), by="days")
   
-  copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
-                          No_Fix=numeric(0), Early_Fix=numeric(0), Late_Fix=numeric(0), 
-                          Per_No_Fix=character(0), Per_Missing_Fix=character(0))
+  copyFrame <- data.frame(Dates=character(0), Per_Exp=numeric(0), Per_95_Ac=numeric(0), Per_99_Ac=numeric(0), Per_99_H=numeric(0))
   
+   
   
 
   for(i in 1:length(dates))
@@ -373,6 +386,6 @@ analyzeAccl <- function(data)
     
   }
   
-  colnames(copyFrame) <- c("Date" )
+  colnames(copyFrame) <- c("Date", "Percent Expected Recordings", "95 Percentile Activities", "99 Percentile Activities", '99.99 Percentile High Activities')
   return(copyFrame)
 }
