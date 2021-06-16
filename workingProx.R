@@ -14,17 +14,21 @@ library(lubridate)
 #Data Loading ---- 
 
 testData1 <- read.csv(file = "raw/testData/PostProx1.csv", header = TRUE, stringsAsFactors=FALSE)
-testData1 <- transform(testData1, ID = 30380)
+testData1 <- transform(testData1, ID = 30378)
  
+
 testData2 <- read.csv(file = "raw/testData/PostProx2.csv", header = TRUE, stringsAsFactors=FALSE)
-testData2 <- transform(testData1, ID = 30381)
+testData2 <- transform(testData2, ID = 30379)
 
 combTest <- testData1[1,]
 combTest$Stop <- testData1$Stop[2] 
 combTest$Session <- combTest$Session +testData1$Session[2]
 #Working Tests ----
+testNewNew <- proxPrep("1.", 30380)
 
 newTest <- rbind(testData1, testData2)
+
+df <- transform(testData1, Test1 = as.numeric(testData1$Start))
 
 newTest <- testData2
 
@@ -84,13 +88,77 @@ if(newTest$Proximity[8] == newTest$Proximity[8 + 1] & newTest$Stop[8] == newTest
 #apply this since it will give seconds since the epoch, add +/- some to be determined value and check to see if the start time falls within the range of it. 
 #as.numeric((df$GMT[2] - df$GMT[2118]), units ="secs")
 
+testingLoop <- transform(testingLoop, StartNum = as.numeric(testingLoop$Start), StopNum = as.numeric(testingLoop$Stop))
+df1 <- tail(df, -1)
+ testData1 <- mstConversion(testData1)
+ 
+ 
+ #Function Testing Proxiimity Comparision Test ----
+ 
+testingLoop <- rbind(testData1, testData2)
+
+firstItr <- testingLoop[5,]
+firstItr
+firstFilter <- testingLoop[firstItr$Proximity == testingLoop$ID,]
+
+firstFilterDate <- firstFilter[firstFilter$StartNum <= firstItr$StopNum, ]
+
+if(nrow(firstFilterDate) == 0)
+  disagreement++
+else
+  for(j in 1:nrow())
+  firstFilter[nrow(firstFilter),]
+
+#Test View ----
+test1 <- testingLoop[(testingLoop$Proximity == 30379) & (testingLoop$ID == 30378),]
+test2 <- testingLoop[(testingLoop$Proximity == 30378) & (testingLoop$ID == 30379),]
+
+test2 <- rbind(test2,test2)
+
+testSelect <-  hold %>% select(StartNum, StopNum)
+
+ID_Vec <- c(30378,30379,30380,30381,30382,30383,30384,30385,30386,30387,30388,30389,30390,30391)
+
+copyFrame <- data.frame(Start_Difference=numeric(0), Stop_Difference=numeric(0), ID=numeric(0), Proximity=numeric(0))
+
+for(i in 1:14)
+{
+  checkingID <- data[data$ID == ID_Vec[i],]
+  
+  for(j in 1:14)
+  {
+    verifyingID <- data[data$ID == ID_Vec[j],]
+    
+    if(verifyingID$ID == checkingID$ID) {
+      copyFrame[nrow(copyFrame) + 1,] <- NA
+    }
+    else if(nrow(verifyingID) == nrow(checkingID)) {
+      holdFrame <- verifyingID %>% select(StartNum, StopNum)
+      holdFrame <- verifyingID - checkingID
+      holdFrame <- transform(holdFrame, ID = ID_Vec[i], Proximity = ID_Vec[j])
+      
+      copyFrame <- rbind(copyFrame, holdFrame)
+    }
+    else {
+      copyFrame[nrow(copyFrame) + 1,] <- NA
+    }
+    
+  }
+  
+}
+
+
 
 #Functions ----
 mstConversion <- function(data)
 {
-  tempDate <- strptime(data$GMT, "%Y-%m-%d %H:%M", tz = "GMT")
-  tempData  <- with_tz(tempDate, "America/Edmonton")
-  data$GMT <- tempData 
+  tempData1 <- strptime(data$Start, "%Y-%m-%d %H:%M", tz = "GMT")
+  tempData1  <- with_tz(tempData1, "America/Edmonton")
+  data$Start <- tempData1 
+  
+  tempData2 <- strptime(data$Start, "%Y-%m-%d %H:%M", tz = "GMT")
+  tempData2 <- with_tz(tempData2, "America/Edmonton")
+  data$Stop <- tempData2 
   
   return(data)  
 }
@@ -350,26 +418,28 @@ proxPrep <- function(index, inputID)
   {
     if(substr(testList[i], 9, 10) == index) {
       
-      filePath <- paste('raw/accl/post/', testList[i], sep="") 
-      
+      filePath <- paste('raw/prox/post/', testList[i], sep="") 
+
       holdFrame <- read.csv(file = filePath, header = TRUE)
-      
+
       if(counter == 0) {
         copyFrame <- holdFrame
-        
+
       }
       else {
         copyFrame <- rbind(copyFrame, holdFrame)
       }
-      
+
       counter <- counter + 1
-      
-    }
+
+      }
   }
   
   data <- mstConversion(copyFrame)
   
   data <- transform(data, ID = inputID)
+  data <- transform(data, StartNum = as.numeric(data$Start), StopNum = as.numeric(data$Stop))
   
   return(data)
 }
+
