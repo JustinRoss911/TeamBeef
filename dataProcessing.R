@@ -534,8 +534,13 @@ collarAvg <- function(data, ID)
 {
   copyFrame <- data.frame(ID=numeric(0),Per_Good_Fixes=numeric(0), Percent_No_Fix_to_Total=numeric(0), Per_Missing__to_Expected_Fix=numeric(0), Per_Out_of_Bounds=numeric(0))
   goodFixes <- mean(data$Per_Good_Fixes) 
-  noFix <- mean(data$Percent_No_Fix_to_Total)
-  missingFix <- mean(data$Per_Missing__to_Expected_Fix) 
+  
+  noFix <- data[data$Percent_No_Fix_to_Total < 5,]
+  noFix <- mean(noFix$Percent_No_Fix_to_Total)
+  
+  missingFix <- data[data$Per_Missing__to_Expected_Fix < 5,]
+  missingFix <- mean(missingFix$Per_Missing__to_Expected_Fix) 
+  
   outFix <- mean(data$Out_of_Bounds)
   
   holdFrame <- data.frame(ID, goodFixes, noFix, missingFix, outFix)

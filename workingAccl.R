@@ -434,6 +434,7 @@ analyzeAccl <- function(data)
       holdFrame <- data.frame(rowDate, perExp, per95, per99, per99H)
       copyFrame <- rbind(copyFrame, holdFrame)
     }
+    
     else {
       perExpTotal <- nrow(dataDay)
       perExp <- perExpTotal / (86400/2)
