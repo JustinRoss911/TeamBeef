@@ -53,7 +53,7 @@ loadData <- function(type, path)
       # copyFrame$DateTime <- tempData 
     }
     
-    copyFrame <- transform(copyFrame, CollarID = fileID)
+    copyFrame <- transform(copyFrame, CollarID = as.factor(fileID))
     
     prefix <- "ID"
     varname <- paste(prefix, fileID, sep="_")
