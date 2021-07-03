@@ -7,9 +7,9 @@ source("loadData.R")
 #rm(list=ls())
 
 
-jkTest <- loadData("gps", "gps/post")
+jkTest <- loadData("accl", "accl/post")
 newU <- filterCalendar(jkTest)
-test <- newU[[4]]
+test <- newU[[1]]
 
 testi <- test[1:(nrow(test) - 1), ]
 testn <- test[2:nrow(test), ]
@@ -24,6 +24,7 @@ testYO <- c(1:18864)
 
 testYe <- cbind(test, testYO)
 
+coolQuick <- testNew[testNew$testn...testi != 2,]
 
 #Notes ----
 #The inclusion of the %p allows for the proper parsing of the datetime object. Lastly, just need to select for 
@@ -86,7 +87,9 @@ filterCalendar <- function(dataIn)
     copyFrame <- dataIn[[varname]]
     copyFrame <- copyFrame[onTime < copyFrame$DateTime & offTime > copyFrame$DateTime, ]
     
-    if(nrow(copyFrame) > 0)
+    if(is.null(copyFrame))
+    {print(nrow(copyFrame))}
+    else if(nrow(copyFrame) > 0)
     {
       copyFrame <- transform(copyFrame, BullID = BullID)
       
