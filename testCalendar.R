@@ -9,15 +9,16 @@ source("loadData.R")
 #rm(list=ls())
 
 
-gpsTest <- loadData("gps", "gps/post")
-gpsFiltered <- filterCalendar(gpsTest)
-gpsFiltered <- speedAndTimeDifference(gpsFiltered)
+acclTest <- loadData("accl", "accl/post")
+acclFiltered <- filterCalendar(acclTest)
+acclFiltered <- timeDifference(acclFiltered)
 
 gpsTestResults <- gpsFixCheck(gpsFiltered)
 
+dataIn <- gpsTestResults
+
 
 #Testing Code ---- 
-
 # testData <- fatFree[[2]]
 # 
 # testCalendar <- loadCalendar()
@@ -232,6 +233,49 @@ speedAndTimeDifference <- function(dataIn)
   return(dataList)
 }
 
+timeDifference <- function(dataIn)
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    timeFirst <-  copyFrame[1:(nrow(copyFrame) - 1), ]
+    timeSecond <- copyFrame[2:nrow(copyFrame), ]
+    
+    
+    #Time Difference 
+    timeFirst <- as.numeric(timeFirst$DateTime)
+    timeSecond <- as.numeric(timeSecond$DateTime)
+    
+    time <- timeSecond - timeFirst
+    copyFrame <- copyFrame[2:nrow(copyFrame), ]
+    
+    copyFrame <- cbind(copyFrame, TimeDifference = time)
+    
+    #Loading In 
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }
+  }
+  return(dataList)
+}
+
+
 #GPS Zero Filter Functions ---- 
 extractZeroGPS <- function(dataIn) 
 {
@@ -324,6 +368,35 @@ extractErrenousDates <- function(dataIn)
   return(dataList)
 }
 
+filterErrenousDates <- function(dataIn) 
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    copyFrame <- copyFrame[copyFrame$TimeDifference > 0 & copyFrame$TimeDifference < 600,]
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }   
+  }
+  return(dataList)
+}
+
 #Early, Late and Missing Fixes ----
 gpsFixCheck <- function(dataIn)
 {
@@ -341,11 +414,11 @@ gpsFixCheck <- function(dataIn)
     expectedFixes <- data.frame(dates = seq(start, end, by = 300))
     dateSequence <- data.frame(dates = seq(as.Date(start), as.Date(end), by="days"))
     
-    fileID <- as.factor(eventCalendar$Collar_ID[j])
+    CollarID <- as.factor(eventCalendar$Collar_ID[j])
     BullID <- as.factor(eventCalendar$Bull_ID[j])
     
     prefix <- "ID"
-    varname <- paste(prefix, fileID, sep="_")
+    varname <- paste(prefix, CollarID, sep="_")
     
     copyFrame <- dataIn[[varname]]
     
@@ -386,9 +459,12 @@ gpsFixCheck <- function(dataIn)
         
       }
       
-      holdFrame <- data.frame(date, expFix, fix, noFix, early, late, missing, outBounds, fileID, BullID)
+      holdFrame <- data.frame(date, expFix, fix, noFix, early, late, missing, outBounds, CollarID, BullID)
       outputFrame <- rbind(outputFrame, holdFrame)
     }
+    
+    #change date when dealing with pre-breeding season
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-07-13" & as.Date(outputFrame$date) <= "2020-09-20", ]
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -403,4 +479,130 @@ gpsFixCheck <- function(dataIn)
     }   
   }  
   return(dataList)
+}
+
+#GPS Histogram Plotting ---- 
+gpsHistograms <- function(dataIn)
+{
+  for(j in 1:length(dataIn))
+  {
+    #set to i in the loop 
+    copyFrame <- dataIn[[j]]
+    
+    #Binwidth by Freedman-Diaconis Rule 
+    #change type depending on graph
+    for(i in 1:length(levels(copyFrame$BullID)))
+    {
+      CollarID <- levels(copyFrame$CollarID)
+      CollarID <- CollarID[1]
+      
+      BullID <- levels(copyFrame$BullID)
+      BullID <- BullID[i]
+      copyFrame <- copyFrame[copyFrame$BullID == BullID, ]
+      
+      titleFix <- paste("Collar", CollarID, "Bull", BullID, "Histogram of Fix Rate", sep=" ")
+      titleNoFix <- paste("Collar", CollarID, "Bull", BullID, "Histogram of No Fix Rate", sep=" ")
+      titleMissing <- paste("Collar", CollarID, "Bull", BullID, "Histogram of Missing Fix Rate", sep=" ")
+      
+      #The Freedman-Diaconis RUle for Bin Width Calculation 
+      # x <- copyFrame$missing
+      # bw <- 2 * IQR(x) / length(x)^(1/3)
+      
+      print(qplot(copyFrame$fix,
+                  geom="histogram",
+                  binwidth=20,  
+                  main=titleFix, 
+                  xlab="Daily Number of On Time Fixes", 
+                  fill=I("blue"), 
+                  col=I("black")))
+      
+      print(qplot(copyFrame$noFix,
+                  geom="histogram",
+                  binwidth=10,  
+                  main=titleNoFix, 
+                  xlab="Daily Number of No Fixes", 
+                  fill=I("cyan"), 
+                  col=I("black")))
+      
+      print(qplot(copyFrame$missing,
+                  geom="histogram",
+                  binwidth=20,  
+                  main=titleMissing, 
+                  xlab="Daily Number of Missing Fixes", 
+                  fill=I("green"), 
+                  col=I("black")))
+    }
+  }
+}
+
+#Acclerometer Summarization ---- 
+acclAnalysis <- function(dataIn)
+{
+  eventCalendar <- loadCalendar()
+  dataList <- list()
+  
+  for(j in 1:nrow(eventCalendar))
+  {
+    outputFrame <- data.frame(Dates = character(0), Daily_Frequency = numeric(0), Unexpected_Freqeuncy = numeric(0), Percent_Missing = numeric(0), avgX = numeric(0), avgY = numeric(0), avgZ = numeric(0))
+    
+    start <- eventCalendar$Collar_On[j] 
+    end <- eventCalendar$Collar_Off[j]
+    
+    expectedFixes <- data.frame(dates = seq(start, end, by = 2))
+    dateSequence <- data.frame(dates = seq(as.Date(start), as.Date(end), by="days"))
+    
+    CollarID <- as.factor(eventCalendar$Collar_ID[j])
+    BullID <- as.factor(eventCalendar$Bull_ID[j])
+    
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrame <- dataIn[[varname]]
+    
+    for(i in 1:nrow(dateSequence))
+    {
+      dateFrame <- copyFrame[as.Date(copyFrame$DateTime) == dateSequence$dates[i], ]
+      expFix <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
+      
+      date <- dateSequence$dates[i]
+      
+      if(nrow(dateFrame) == 0)
+      {
+        avgFreqeuncy <- 0
+        unexpectedFrequency <- 0 
+        perMissing <- 100 
+        avgX <- 0 
+        avgY <- 0 
+        avgZ <- 0 
+      }
+      else
+      {
+        avgFreqeuncy <- mean(dateSequence$TimeDifference)
+        unexpectedFrequency <- nrow(dateFrame[dateFrame$TimeDifference != 2, ]) 
+        perMissing <- ((expFix - nrow(dateFrame)) / expFix) * 100 
+        
+        avgX <- mean(dateSequence$X)
+        avgY <- mean(dateSequence$Y)
+        avgZ <- mean(dateSequence$Z)
+        
+      }
+      
+      holdFrame <- data.frame(date, avgFreqeuncy, unexpectedFrequency, perMissing, avgX, avgY, avgZ, CollarID, BullID)
+      outputFrame <- rbind(outputFrame, holdFrame)
+          
+    }
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- outputFrame
+    }   
+    return(dataList)
+  }
 }
