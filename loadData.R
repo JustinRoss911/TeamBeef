@@ -55,6 +55,15 @@ loadData <- function(type, path)
     {
       colnames(copyFrame) <- c("DateTime", "X", "Y", "Z", "Temperature")
       
+      copyFrame$X <- as.numeric(copyFrame$X) * 0.31392 
+      copyFrame$Y <- as.numeric(copyFrame$Y) * 0.31392 
+      copyFrame$Z <- as.numeric(copyFrame$Z) * 0.31392 
+      copyFrame$Temperature <- as.numeric(copyFrame$Temperature)
+      
+      ForceSum <- sqrt(copyFrame$X^2 + copyFrame$Y^2 + copyFrame$Z^2)
+      
+      copyFrame <- cbind(copyFrame, ForceSum)
+        
       copyFrame$DateTime <- strptime(copyFrame$DateTime, "%Y-%m-%d %I:%M:%S %p", tz = "GMT")
       
     #  copyFrame$DateTime <- as.POSIXct(copyFrame$DateTime)
