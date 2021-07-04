@@ -11,9 +11,14 @@ gpsTest <- loadData("gps", "gps/post")
 gpsFiltered <- filterCalendar(gpsTest)
 gpsFiltered <- dateTimeDifference(gpsFiltered)
 
-
-
+gpsZeros <- extractZeroGPS(gpsFiltered)
+fatFree <- filterZeroGPS(gpsFiltered)
 #Testing Code ---- 
+
+
+
+
+#Function for extracting no fix events and returning list (will just filter out following this step)
 
 
 #Calendar Loading Functions ----
@@ -99,7 +104,7 @@ dateTimeDifference <- function(dataIn)
     time <- timeSecond - timeFirst
     copyFrame <- copyFrame[2:nrow(copyFrame), ]
     
-    copyFrame <- cbind(copyFrame, timeDifference = time)
+    copyFrame <- cbind(copyFrame, TimeDifference = time)
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -115,3 +120,66 @@ dateTimeDifference <- function(dataIn)
   }
   return(dataList)
 }
+
+#GPS Zero Filter Functions ---- 
+extractZeroGPS <- function(dataIn) 
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    copyFrame <- copyFrame[copyFrame$Latitude == 0 | copyFrame$Longitude == 0 | copyFrame$Altitude == 0,]
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }   
+  }
+  return(dataList)
+}
+
+filterZeroGPS <- function(dataIn) 
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    copyFrame <- copyFrame[copyFrame$Latitude != 0 | copyFrame$Longitude != 0 | copyFrame$Altitude != 0,]
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }   
+  }
+  return(dataList)
+}
+
+#Errenous Dates Selection Function ---- 
+
+

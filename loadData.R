@@ -18,6 +18,17 @@ loadData <- function(type, path)
     {
       colnames(copyFrame) <- c("DateTime", "Latitude", "Longitude", "Altitude", "Duration", "Temperature", "DOP", "Satellites", "Fix")
       
+      copyFrame <- copyFrame[copyFrame$Fix == "GPS Schedule", ]
+      
+      copyFrame$Latitude <- as.numeric(copyFrame$Latitude)
+      copyFrame$Longitude <- as.numeric(copyFrame$Longitude)
+      copyFrame$Altitude <- as.numeric(copyFrame$Altitude)
+      
+      copyFrame$Duration <- as.numeric(copyFrame$Duration)
+      copyFrame$Temperature <- as.numeric(copyFrame$Temperature)
+      copyFrame$DOP <- as.numeric(copyFrame$DOP)
+      copyFrame$Satellites <- as.factor(copyFrame$Satellites)
+      
      # copyFrame$DateTime <- as.POSIXct(copyFrame$DateTime)
       copyFrame$DateTime <- strptime(copyFrame$DateTime, "%Y-%m-%d %I:%M:%S %p", tz = "GMT")
     #  copyFrame$DateTime <- with_tz(copyFrame$DateTime, "America/Edmonton")
@@ -31,7 +42,6 @@ loadData <- function(type, path)
       
       #copyFrame$Start <- as.POSIXct(copyFrame$Start)
       #copyFrame$Stop <- as.POSIXct(copyFrame$Stop)
-      
       
       copyFrame$Start <- strptime(copyFrame$Start, "%Y-%m-%d %I:%M:%S %p", tz = "GMT")
      # tempStart  <- with_tz(tempStart, "America/Edmonton")
