@@ -9,13 +9,12 @@ source("loadData.R")
 #rm(list=ls())
 
 
-acclTest <- loadData("accl", "accl/post")
-acclFiltered <- filterCalendar(acclTest)
-acclFiltered <- timeDifference(acclFiltered)
+# acclTest <- loadData("accl", "accl/post")
+# acclTest <- filterCalendar(acclTest)
+# acclTest <- timeDifference(acclTest)
+# 
+# acclTestResults <- acclAnalysis(acclTest)
 
-gpsTestResults <- gpsFixCheck(gpsFiltered)
-
-dataIn <- gpsTestResults
 
 
 #Testing Code ---- 
@@ -257,6 +256,7 @@ timeDifference <- function(dataIn)
     copyFrame <- copyFrame[2:nrow(copyFrame), ]
     
     copyFrame <- cbind(copyFrame, TimeDifference = time)
+    copyFrame$DateTime <- date(copyFrame$DateTime)
     
     #Loading In 
     
@@ -558,15 +558,15 @@ acclAnalysis <- function(dataIn)
     varname <- paste(prefix, CollarID, sep="_")
     
     copyFrame <- dataIn[[varname]]
-    
+
     for(i in 1:nrow(dateSequence))
     {
-      dateFrame <- copyFrame[as.Date(copyFrame$DateTime) == dateSequence$dates[i], ]
+      dateFrame <- copyFrame[copyFrame$DateTime == dateSequence$dates[i], ]
       expFix <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
       
       date <- dateSequence$dates[i]
       
-      if(nrow(dateFrame) == 0)
+      if(nrow(dateFrame) == 0 | is.null(dateFrame))
       {
         avgFreqeuncy <- 0
         unexpectedFrequency <- 0 
@@ -577,20 +577,21 @@ acclAnalysis <- function(dataIn)
       }
       else
       {
-        avgFreqeuncy <- mean(dateSequence$TimeDifference)
+        avgFreqeuncy <- mean(dateFrame$TimeDifference)
         unexpectedFrequency <- nrow(dateFrame[dateFrame$TimeDifference != 2, ]) 
         perMissing <- ((expFix - nrow(dateFrame)) / expFix) * 100 
         
-        avgX <- mean(dateSequence$X)
-        avgY <- mean(dateSequence$Y)
-        avgZ <- mean(dateSequence$Z)
+        avgX <- mean(dateFrame$X)
+        avgY <- mean(dateFrame$Y)
+        avgZ <- mean(dateFrame$Z)
         
       }
       
       holdFrame <- data.frame(date, avgFreqeuncy, unexpectedFrequency, perMissing, avgX, avgY, avgZ, CollarID, BullID)
       outputFrame <- rbind(outputFrame, holdFrame)
-          
     }
+    
+    
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -603,6 +604,6 @@ acclAnalysis <- function(dataIn)
     {
       dataList[[varname]] <- outputFrame
     }   
-    return(dataList)
   }
+  return(dataList)
 }
