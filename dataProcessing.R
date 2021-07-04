@@ -327,7 +327,7 @@ indexCopyFrame6 <- function(dataInput, index)
 
 analyzeFixes <- function(data)
 {
-  #2020-07-13 for pre/post switch over 2020-06-18
+  #2020-07-13 for pre/post switch over 2020-06-18, 
   dates <- seq(as.Date("2020-06-18"), as.Date("2020-07-13"), by="days")
   
   copyFrame <- data.frame(Dates=character(0), Expected_Fixes=numeric(0), On_Time_Fix=numeric(0), 
