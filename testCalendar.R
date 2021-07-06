@@ -2,22 +2,23 @@
 library(tidyverse)
 library(lubridate)
 library(geosphere)
-
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(forcats)
+library(scales)
 
 source("loadData.R")
 
 #rm(list=ls())
 
-gpNew <- loadData("gps", "gps/pre")
-gpFil <- filterCalendar(gpNew)
+gpsRaw <- loadData("gps", "gps/pre")
+gpsCalendar <- filterCalendar(gpsRaw)
 
-gp <- speedAndTimeDifference(gpFil)
-gpsre <- gpsFixCheck(gp)
+gpsFiltered <- speedAndTimeDifference(gpsCalendar)
+gpsResults <- gpsFixCheck(gpsFiltered)
 
-gpsHistograms(gpsre)
-
-t <- gp[["ID_80384"]]
-class(t$DateTime)
+gpsPie(gpsResults)
 
 # acclTest <- loadData("accl", "accl/post")
 # acclTest <- filterCalendar(acclTest)
@@ -25,103 +26,7 @@ class(t$DateTime)
 # 
 # acclTestResults <- acclAnalysis(acclTest)
 
-
-
 #Testing Code ---- 
-# testData <- fatFree[[2]]
-# 
-# testCalendar <- loadCalendar()
-# 
-# start <- testCalendar$Collar_On[1] 
-# end <- testCalendar$Collar_Off[1]
-# #sets sequence, change interval second to desired. 
-# expectedFixes <- data.frame(expectedRecording = seq(start, end, by = 300))
-# #gives the dates 
-# dateSequence <- data.frame(dates = seq(as.Date(start), as.Date(end), by="days"))
-# 
-# copyFrame <- data.frame(Dates = character(0), Expected_Fixes = numeric(0), On_Time_Fix = numeric(0), Early_Fix = numeric(0), Late_Fix = numeric(0), Missing_Fix = numeric(0), CollarID = numeric(0), BullID = numeric(0))
-# 
-# 
-# new <- testData[as.Date(testData$DateTime) == dateSequence$dates[29],]
-# 
-# meanTime <- mean(testData$TimeDifference)
-# meanTime
-# test <- as.factor(c(1, 2))
-# #Function for extracting no fix events and returning list (will just filter out following this step)
-# dataIn <- gpsFiltered
-# 
-# eventCalendar <- loadCalendar()
-# dataList <- list()
-# 
-# for(j in 1:nrow(eventCalendar))
-# {
-# 
-#   outputFrame <- data.frame(Dates = character(0), Expected_Fixes = numeric(0), On_Time_Fix = numeric(0), No_Fix = numeric(0), Early_Fix = numeric(0), Late_Fix = numeric(0), Missing_Fix = numeric(0), CollarID = numeric(0), BullID = numeric(0))
-# 
-#   start <- eventCalendar$Collar_On[j] 
-#   end <- eventCalendar$Collar_Off[j]
-# 
-#   expectedFixes <- data.frame(dates = seq(start, end, by = 300))
-#   dateSequence <- data.frame(dates = seq(as.Date(start), as.Date(end), by="days"))
-#   
-#   fileID <- as.factor(eventCalendar$Collar_ID[j])
-#   BullID <- as.factor(eventCalendar$Bull_ID[j])
-#   
-#   prefix <- "ID"
-#   varname <- paste(prefix, fileID, sep="_")
-#   
-#   copyFrame <- dataIn[[varname]]
-#   
-#   
-#   for(i in 1:nrow(dateSequence))
-#   {
-#     dateFrame <- copyFrame[as.Date(copyFrame$DateTime) == dateSequence$dates[i], ]
-#     expFix <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
-#     
-#    
-#     
-#     date <- dateSequence$dates[i]
-#     
-#     if(nrow(dateFrame) == 0)
-#     {
-#       fix <- 0 
-#       noFix <- 0 
-#       early <- 0 
-#       late <- 0 
-#       missing <- expFix
-#     }
-#     else
-#     {
-#       withZero <- nrow(dateFrame)
-#       withoutZero <- nrow(dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,])
-#       noFix <- withZero - withoutZero
-#       
-#       dateFrame <- dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,]
-#       
-#       fix <- nrow(dateFrame[dateFrame$TimeDifference >= 240 & dateFrame$TimeDifference <= 360, ])
-#       early <- nrow(dateFrame[dateFrame$TimeDifference < 240, ])
-#       late <- nrow(dateFrame[dateFrame$TimeDifference > 360, ])
-#       
-#       missing <- expFix - (fix + early + late)
-#     }
-#     
-#     holdFrame <- data.frame(date, expFix, fix, noFix, early, late, missing, fileID, BullID)
-#     outputFrame <- rbind(outputFrame, holdFrame)
-#   }
-#   
-#   logNames <- names(dataList) == varname
-#   listSum <- sum(logNames)
-#   
-#   if(listSum > 0)
-#   {
-#     dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
-#   }
-#   else
-#   {
-#     dataList[[varname]] <- outputFrame
-#   }   
-#   
-# }  
 
 #Calendar Loading Functions ----
 loadCalendar <- function()
@@ -478,7 +383,8 @@ gpsFixCheck <- function(dataIn)
     }
     
     #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
-    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-09-20", ]
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-07-13", ]
+    outputFrame <- arrange(outputFrame, date)
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -549,6 +455,54 @@ gpsHistograms <- function(dataIn)
   }
 }
 
+#GPS Pie Chart ----
+gpsPie <- function(dataIn)
+{
+  for(j in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[j]]
+    
+    for(i in 1:length(levels(copyFrame$BullID)))
+    {
+      CollarID <- levels(copyFrame$CollarID)
+      CollarID <- CollarID[1]
+      
+      BullID <- levels(copyFrame$BullID)
+      BullID <- BullID[i]
+      copyFrame <- copyFrame[copyFrame$BullID == BullID, ]
+      
+      fix <- mean(copyFrame$fix) / mean(copyFrame$expFix) * 100
+      nofix <- mean(copyFrame$noFix) / mean(copyFrame$expFix) * 100
+      earlyfix <- mean(copyFrame$early) / mean(copyFrame$expFix) * 100
+      latefix <- mean(copyFrame$late) / mean(copyFrame$expFix) * 100
+      missingfix <- mean(copyFrame$missing) / mean(copyFrame$expFix) * 100
+      outfix <- mean(copyFrame$outBounds) / mean(copyFrame$expFix) * 100
+      
+      data <- data.frame(Type = c("Fix", "noFix", "earlyFix", "lateFix", "missingFix", "outOfBounds"), 
+                         values = c(fix, nofix, earlyfix, latefix, missingfix, outfix))
+      
+      data <- cbind(data, label = signif(data$values, digits = 4))
+      data$label <- paste0(data$label, "%")
+      
+      
+      title <- paste("Collar", CollarID, "Bull", BullID, "Pie Chart Average % Summary", sep=" ")
+      
+      p <- ggplot(data,aes(x=1,y=values,fill=Type)) + geom_bar(stat="identity", color = "black")
+      
+      p <- p + coord_polar(theta='y')+ theme(axis.ticks=element_blank(),
+                                             axis.text.y=element_blank(),
+                                             axis.text.x=element_text(colour='black'),
+                                             axis.title=element_blank())
+      
+      p <- p + scale_y_continuous(breaks=cumsum(data$values) - data$values / 2, labels= data$label)
+      
+      p <- p + ggtitle(title)
+      
+      print(p)
+      
+    }
+  }
+}
 #Acclerometer Summarization ---- 
 acclAnalysis <- function(dataIn)
 {
