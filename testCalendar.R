@@ -8,6 +8,16 @@ source("loadData.R")
 
 #rm(list=ls())
 
+gpNew <- loadData("gps", "gps/pre")
+gpFil <- filterCalendar(gpNew)
+
+gp <- speedAndTimeDifference(gpFil)
+gpsre <- gpsFixCheck(gp)
+
+gpsHistograms(gpsre)
+
+t <- gp[["ID_80384"]]
+class(t$DateTime)
 
 # acclTest <- loadData("accl", "accl/post")
 # acclTest <- filterCalendar(acclTest)
@@ -193,7 +203,6 @@ speedAndTimeDifference <- function(dataIn)
     p1 <-  copyFrame[1:(nrow(copyFrame) - 1), ]
     p2 <- copyFrame[2:nrow(copyFrame), ]
     
-    
     #Time Difference 
     timeFirst <- as.numeric(timeFirst$DateTime)
     timeSecond <- as.numeric(timeSecond$DateTime)
@@ -206,14 +215,15 @@ speedAndTimeDifference <- function(dataIn)
     #Speed
     p1GPS <- p1 %>% select(Latitude, Longitude)
     p2GPS <- p2 %>% select(Latitude, Longitude)
-    
+
     p1GPS <- p1GPS[c('Longitude', "Latitude")]
     p2GPS <- p2GPS[c('Longitude', "Latitude")]
-    
+
     distance <- distGeo(p1GPS, p2GPS)
     speed <- abs(distance / time)
-    
+
     copyFrame <- cbind(copyFrame, Speed = speed)
+    copyFrame$DateTime <- date(copyFrame$DateTime)
     
     #Loading In 
     
@@ -425,12 +435,16 @@ gpsFixCheck <- function(dataIn)
     
     for(i in 1:nrow(dateSequence))
     {
-      dateFrame <- copyFrame[as.Date(copyFrame$DateTime) == dateSequence$dates[i], ]
+      dateFrame <- copyFrame[copyFrame$DateTime == dateSequence$dates[i], ]
       expFix <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
       
-      date <- dateSequence$dates[i]
       
-      if(nrow(dateFrame) == 0)
+      
+      date <- dateSequence$dates[i]
+
+      if(is.null(copyFrame))
+      {}
+      else if(nrow(copyFrame) == 0)
       {
         fix <- 0 
         noFix <- 0 
@@ -439,13 +453,14 @@ gpsFixCheck <- function(dataIn)
         missing <- expFix
         outBounds <- 0 
       }
-      else
+      else if(nrow(copyFrame) > 0)
       {
         withZero <- nrow(dateFrame)
         withoutZero <- nrow(dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,])
         noFix <- withZero - withoutZero
         
         dateFrame <- dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,]
+        
         
         outBounds <- nrow(dateFrame[dateFrame$Speed > 10, ]) 
         dateFrame <- dateFrame[dateFrame$Speed <= 10, ] 
@@ -456,15 +471,14 @@ gpsFixCheck <- function(dataIn)
         
         missing <- expFix - (fix + early + late)
         
-        
       }
       
       holdFrame <- data.frame(date, expFix, fix, noFix, early, late, missing, outBounds, CollarID, BullID)
       outputFrame <- rbind(outputFrame, holdFrame)
     }
     
-    #change date when dealing with pre-breeding season
-    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-07-13" & as.Date(outputFrame$date) <= "2020-09-20", ]
+    #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-09-20", ]
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
