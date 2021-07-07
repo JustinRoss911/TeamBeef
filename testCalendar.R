@@ -12,13 +12,18 @@ source("loadData.R")
 
 #rm(list=ls())
 
-gpsRaw <- loadData("gps", "gps/pre")
-gpsCalendar <- filterCalendar(gpsRaw)
+gpsRawPre <- loadData("gps", "gps/pre")
+gpsCalendarPre <- filterCalendar(gpsRawPre)
+gpsFilteredPre <- speedAndTimeDifference(gpsCalendarPre)
+gpsResultsPre <- gpsFixCheck(gpsFilteredPre)
+gpsPie(gpsResultsPre)
 
-gpsFiltered <- speedAndTimeDifference(gpsCalendar)
-gpsResults <- gpsFixCheck(gpsFiltered)
+gpsRawPost <- loadData("gps", "gps/post")
+gpsCalendarPost <- filterCalendar(gpsRawPost)
+gpsFilteredPost <- speedAndTimeDifference(gpsCalendarPost)
+gpsResultsPost <- gpsFixCheck(gpsFilteredPost)
+gpsPie(gpsResultsPost)
 
-gpsPie(gpsResults)
 
 # acclTest <- loadData("accl", "accl/post")
 # acclTest <- filterCalendar(acclTest)
@@ -383,7 +388,7 @@ gpsFixCheck <- function(dataIn)
     }
     
     #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
-    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-07-13", ]
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-07-13" & as.Date(outputFrame$date) <= "2020-09-20", ]
     outputFrame <- arrange(outputFrame, date)
     
     logNames <- names(dataList) == varname
@@ -462,6 +467,8 @@ gpsPie <- function(dataIn)
   {
     copyFrame <- dataIn[[j]]
     
+    #add condition to break if a level is NA
+    
     for(i in 1:length(levels(copyFrame$BullID)))
     {
       CollarID <- levels(copyFrame$CollarID)
@@ -481,11 +488,11 @@ gpsPie <- function(dataIn)
       data <- data.frame(Type = c("Fix", "noFix", "earlyFix", "lateFix", "missingFix", "outOfBounds"), 
                          values = c(fix, nofix, earlyfix, latefix, missingfix, outfix))
       
-      data <- cbind(data, label = signif(data$values, digits = 4))
+      data <- cbind(data, labels = signif(data$values, digits = 4))
       data$label <- paste0(data$label, "%")
       
       
-      title <- paste("Collar", CollarID, "Bull", BullID, "Pie Chart Average % Summary", sep=" ")
+      title <- paste("Collar", CollarID, "Bull", BullID, "Pie Chart Average % Summary Post-Breeding", sep=" ")
       
       p <- ggplot(data,aes(x=1,y=values,fill=Type)) + geom_bar(stat="identity", color = "black")
       
@@ -494,7 +501,7 @@ gpsPie <- function(dataIn)
                                              axis.text.x=element_text(colour='black'),
                                              axis.title=element_blank())
       
-      p <- p + scale_y_continuous(breaks=cumsum(data$values) - data$values / 2, labels= data$label)
+     # p <- p + scale_y_continuous(breaks=cumsum(data$values) - data$values / 2, labels= data$label)
       
       p <- p + ggtitle(title)
       
