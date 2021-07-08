@@ -4,34 +4,45 @@ library(lubridate)
 library(geosphere)
 library(dplyr)
 library(ggplot2)
-library(ggrepel)
 library(forcats)
 library(scales)
 
 source("loadData.R")
-
 #rm(list=ls())
 
 gpsRawPre <- loadData("gps", "gps/pre")
 gpsCalendarPre <- filterCalendar(gpsRawPre)
 gpsFilteredPre <- speedAndTimeDifference(gpsCalendarPre)
+gpsBadDatesPre <- extractErrenousDates(gpsFilteredPre)
+gpsFilteredPre <- filterErrenousDates(gpsFilteredPre)
+
 gpsResultsPre <- gpsFixCheck(gpsFilteredPre)
-gpsPie(gpsResultsPre)
+gpsResultsPre <- gpsSummary(gpsResultsPre, gpsBadDatesPre)
+
+
 
 gpsRawPost <- loadData("gps", "gps/post")
 gpsCalendarPost <- filterCalendar(gpsRawPost)
 gpsFilteredPost <- speedAndTimeDifference(gpsCalendarPost)
+gpsBadDatesPost <- extractErrenousDates(gpsFilteredPost)
+gpsFilteredPost <- filterErrenousDates(gpsFilteredPost)
+
 gpsResultsPost <- gpsFixCheck(gpsFilteredPost)
-gpsPie(gpsResultsPost)
+gpsResultsPost <- gpsSummary(gpsResultsPost, gpsBadDatesPost)
 
 
-# acclTest <- loadData("accl", "accl/post")
-# acclTest <- filterCalendar(acclTest)
-# acclTest <- timeDifference(acclTest)
-# 
-# acclTestResults <- acclAnalysis(acclTest)
+write.csv(gpsResultsPre, "F:/Development/Projects/Research/TeamBeef/workingProject/output/preGPS.csv", row.names = FALSE)
+write.csv(gpsResultsPost, "F:/Development/Projects/Research/TeamBeef/workingProject/output/postGPS.csv", row.names = FALSE)
+
 
 #Testing Code ---- 
+test <- gpsSummary(gpsResultsPost, badDates)
+
+specie <- c(rep("sorgho" , 3) , rep("poacee" , 3) , rep("banana" , 3) , rep("triticum" , 3) )
+condition <- rep(c("normal" , "stress" , "Nitrogen") , 4)
+value <- abs(rnorm(12 , 0 , 15))
+data <- data.frame(specie,condition,value)
+
 
 #Calendar Loading Functions ----
 loadCalendar <- function()
@@ -581,4 +592,73 @@ acclAnalysis <- function(dataIn)
     }   
   }
   return(dataList)
+}
+
+#Summarization ----
+gpsSummary <- function(results, badDates)
+{
+  outputFrame <- data.frame(ID = character(0), expFix = numeric(0), Fix = numeric(0), noFix = numeric(0), early = numeric(0), late = numeric(0), missing = numeric(0), outBounds = numeric(0), errenousDates = numeric(0))
+  
+  
+  for(j in 1:length(results))
+  {
+    copyFrameResults <- results[[j]]
+    
+    CollarID <- as.factor(copyFrameResults$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrameDates <- badDates[[varname]]
+    
+    for(i in 1:length(levels(copyFrameResults$BullID)))
+    {
+      
+      BullID <- levels(copyFrameResults$BullID)
+      BullID <- BullID[i]
+      holdFrameResults <- copyFrameResults[copyFrameResults$BullID == BullID, ]
+      holdFrameDates <- copyFrameDates[copyFrameDates$BullID == BullID, ]
+      
+      if(is.null(holdFrameResults) | is.null(holdFrameDates))
+      {}
+      else if(nrow(holdFrameResults) == 0)
+      {
+        expFix <- 0
+        fix <- 0 
+        noFix <- 0 
+        early <- 0 
+        late <- 0
+        missing <- 0
+        outBounds <- 0 
+        errenousDates <- nrow(holdFrameDates)
+      }
+      else if(nrow(holdFrameResults) > 0)
+      {
+        expFix <- sum(holdFrameResults$expFix)
+        fix <- sum(holdFrameResults$fix)
+        noFix <- sum(holdFrameResults$noFix) 
+        early <- sum(holdFrameResults$early) 
+        late <- sum(holdFrameResults$late)
+        missing <- sum(holdFrameResults$missing)
+        outBounds <- sum(holdFrameResults$outBounds)
+        errenousDates <- nrow(holdFrameDates)
+      }
+      
+      ID <- paste("CollarID", CollarID, "BullID", BullID, sep=" ")
+      
+      holdFrame <- data.frame(ID, expFix, fix, noFix, early, late, missing, outBounds, errenousDates)
+      outputFrame <- rbind(outputFrame, holdFrame)
+    }
+  }
+  
+  sumFix <- (outputFrame$fix + outputFrame$noFix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$outBounds + outputFrame$errenousDates)
+  
+  outputFrame$fix <- outputFrame$fix / sumFix * 100
+  outputFrame$noFix <- outputFrame$noFix / sumFix * 100
+  outputFrame$early <- outputFrame$early / sumFix * 100
+  outputFrame$late <- outputFrame$late / sumFix * 100
+  outputFrame$missing <- outputFrame$missing / sumFix * 100
+  outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
+  outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+  
+  return(outputFrame)
 }

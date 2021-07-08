@@ -21,9 +21,9 @@ testFile <- loadData("gps", "gps/pre")
 testFile <- testFile[[1]]
 
 testGPS <- testFile[c('Longitude', "Latitude")]
+coordinates(testGPS) <- cbind(testGPS$Longitude, testGPS$Latitude)
 
-
-directoryPath <- paste("raw/", "bounds/polygons/pen1", "/", sep="")
+directoryPath <- paste("raw/", "bounds/polygons/test", "/", sep="")
 fileList <- list.files(directoryPath)
 filePath <- paste(directoryPath, fileList[6], sep="")
 
@@ -51,7 +51,14 @@ proj4string(pen2) <- CRS.new
 
 crs_wgs84 <- CRS("EPSG:4326") # WGS84 has EPSG code 4326
 
-t <- over(testGPS, pen1)
+t <- over(pen3, testGPS)
+
+t <- t[!is.na(t$Shape_Leng) | !is.na(t$Shape_Area),]
+
+pen1WG <- spTransform(pen1, CRS("+proj=longlat +datum=WGS84"))
+proj4string(testGPS) <- proj4string(pen1WG)
+
+plot(pen1)
 
 
-plot(t, col="#f2f2f2", bg="skyblue", lwd=0.25)
+
