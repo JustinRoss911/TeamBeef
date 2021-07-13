@@ -1,0 +1,118 @@
+Bull,Collar,StartDate,EndDate,Pen/Pasture,arcGISShapeFileName
+32,80383,18-Jun-20,26-Jun-20,CE1,CE_1
+143,80380,18-Jun-20,26-Jun-20,CE1,CE_1
+453,80382,18-Jun-20,26-Jun-20,CE1,CE_1
+5175,80379,18-Jun-20,26-Jun-20,CE1,CE_1
+6035,80381,18-Jun-20,26-Jun-20,CE1,CE_1
+82,80384,18-Jun-20,26-Jun-20,CE2,CE_2
+934,80391,18-Jun-20,26-Jun-20,CE2,CE_2
+941,80390,18-Jun-20,26-Jun-20,CE2,CE_2
+7245,80387,18-Jun-20,26-Jun-20,CE2,CE_2
+8172,80389,18-Jun-20,26-Jun-20,CE2,CE_2
+8239,80386,18-Jun-20,26-Jun-20,CE2,CE_2
+8267,80388,18-Jun-20,26-Jun-20,CE2,CE_2
+8294,80385,18-Jun-20,26-Jun-20,CE2,CE_2
+32,80383,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+143,80380,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+82,80384,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+453,80382,26-Jun-20,03-Jul-20,pasture W of CE pens,CE_SE
+934,80391,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+941,80390,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+5175,80379,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+6035,80381,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+7245,80387,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+8172,80389,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+8239,80386,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+8267,80388,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+8294,80385,26-Jun-20,27-Jun-20,pasture W of CE pens,CE_SE
+32,80383,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+143,80380,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+82,80384,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+934,80391,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+941,80390,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+5175,80379,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+6035,80381,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+7245,80387,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+8172,80389,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+8239,80386,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+8267,80388,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+8294,80385,27-Jun-20,03-Jul-20,CE pens,CE_Pens
+32,80383,03-Jul-20,END,Pasture N of CE pens,CE_NW
+143,80380,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+82,80384,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+453,80382,03-Jul-20,END,Pasture N of CE pens,CE_NW
+934,80391,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+941,80390,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+5175,80379,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+6035,80381,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+7245,80387,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+8172,80389,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+8239,80386,03-Jul-20,14-Jul-20,Pasture N of CE pens,CE_NW
+8267,80388,03-Jul-20,29-Jul-20,Pasture N of CE pens,CE_NW
+8294,80385,03-Jul-20,14-Jul-20,Pasture N of CE pens,CN_N1
+143,80380,14-Jul-20,20-Jul-20,CN-N (farthest N pasture),CN_N1
+941,80390,14-Jul-20,20-Jul-20,CN-N (farthest N pasture),CN_N1
+5175,80378,14-Jul-20,20-Jul-20,CN-N (farthest N pasture),CN_N1
+8172,80389,14-Jul-20,20-Jul-20,CN-N (farthest N pasture),CN_N1
+8294,80385,14-Jul-20,20-Jul-20,CN-N (farthest N pasture),CN_N1
+82,80384,14-Jul-20,27-Jul-20,CN-S (east pasture) and pasture by road with hayshed,"CN_SN, CN_SE"
+934,80391,14-Jul-20,27-Jul-20,CN-S (east pasture) and pasture by road with hayshed,"CN_SN, CN_SE"
+6035,80381,14-Jul-20,27-Jul-20,CN-S (east pasture) and pasture by road with hayshed,"CN_SN, CN_SE"
+7245,80387,14-Jul-20,27-Jul-20,CN-S (east pasture) and pasture by road with hayshed,"CN_SN, CN_SE"
+8239,80386,14-Jul-20,27-Jul-20,CN-S (east pasture) and pasture by road with hayshed,"CN_SN, CN_SE"
+143,80380,20-Jul-20,27-Jul-20,CN-N (2nd most northernly pasture),CN_N2
+941,80390,20-Jul-20,27-Jul-20,CN-N (2nd most northernly pasture),CN_N2
+5175,80378,20-Jul-20,27-Jul-20,CN-N (2nd most northernly pasture),CN_N2
+8172,80389,20-Jul-20,27-Jul-20,CN-N (2nd most northernly pasture),CN_N2
+8294,80385,20-Jul-20,27-Jul-20,CN-N (2nd most northernly pasture),CN_N2
+143,80380,27-Jul-20,06-Aug-20,CN-N (3rd most northernly pasture),CN_N3
+941,80390,27-Jul-20,06-Aug-20,CN-N (3rd most northernly pasture),CN_N3
+5175,80378,27-Jul-20,06-Aug-20,CN-N (3rd most northernly pasture),CN_N3
+8172,80389,27-Jul-20,06-Aug-20,CN-N (3rd most northernly pasture),CN_N3
+8294,80385,27-Jul-20,06-Aug-20,CN-N (3rd most northernly pasture),CN_N3
+82,80384,27-Jul-20,29-Jul-20,CN-S pasture by road with hayshed with water access in farthest east pasture limited by hot wire running around spring (can only access water and small corner of east pasture),"CN_SN, CN_SE"
+934,80391,27-Jul-20,29-Jul-20,CN-S pasture by road with hayshed with water access in farthest east pasture limited by hot wire running around spring (can only access water and small corner of east pasture),"CN_SN, CN_SE"
+6035,80381,27-Jul-20,29-Jul-20,CN-S pasture by road with hayshed with water access in farthest east pasture limited by hot wire running around spring (can only access water and small corner of east pasture),"CN_SN, CN_SE"
+7245,80387,27-Jul-20,29-Jul-20,CN-S pasture by road with hayshed with water access in farthest east pasture limited by hot wire running around spring (can only access water and small corner of east pasture),"CN_SN, CN_SE"
+8239,80386,27-Jul-20,29-Jul-20,CN-S pasture by road with hayshed with water access in farthest east pasture limited by hot wire running around spring (can only access water and small corner of east pasture),"CN_SN, CN_SE"
+7245,80387,29-Jul-20,END,CE,CE_SE
+82,80384,29-Jul-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+934,80391,29-Jul-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+6035,80381,29-Jul-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+7245,80387,29-Jul-20,29-Jul-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+8239,80386,29-Jul-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+8267,80388,29-Jul-20,18-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+9169,80382,29-Jul-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+7245,80387,29-Jul-20,END,"Collar 10 removed from pasture and collar pulled due to injured penis. Bull moved to CE, treated with biomycin and meloxicam","CE_Pens, CE_SE"
+143,80380,06-Aug-20,18-Aug-20,CN-N (farthest south pasture before crops),CN_N4
+941,80390,06-Aug-20,18-Aug-20,CN-N (farthest south pasture before crops),CN_N4
+5175,80378,06-Aug-20,18-Aug-20,CN-N (farthest south pasture before crops),CN_N4
+8172,80389,06-Aug-20,18-Aug-20,CN-N (farthest south pasture before crops),CN_N4
+8294,80385,06-Aug-20,18-Aug-20,CN-N (farthest south pasture before crops),CN_N4
+7,N/A,06-Aug-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+8267,80388,18-Aug-20,END,CE,"CE_Pens, CE_SE"
+143,80380,18-Aug-20,15-Sep-20,CN-N moved to CN-NW (spring tire pasture),CN_NW
+941,80390,18-Aug-20,15-Sep-20,CN-N moved to CN-NW (spring tire pasture),CN_NW
+5175,80378,18-Aug-20,15-Aug-20,CN-N moved to CN-NW (spring tire pasture),CN_NW
+8172,80389,18-Aug-20,14-Aug-20,CN-N moved to CN-NW (spring tire pasture),CN_NW
+8294,80385,18-Aug-20,15-Aug-20,CN-N moved to CN-NW (spring tire pasture),CN_NW
+9127,N/A,18-Aug-20,28-Aug-20,CN-S (pastures SW with water and trees and one in the middle),"CN_SW, CN_SE"
+7,N/A,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+82,80384,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+934,80391,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+6035,80381,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+8239,80386,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+9127,N/A,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+9169,N/A,28-Aug-20,14-Sep-20,CN-S gates opened for access to all pastures,"CN_SW, CN_SE, CN_SN"
+7,N/A,14-Sep-20,END,CE pens,CE_Pens
+82,80384,14-Sep-20,END,CE pens,CE_Pens
+934,80391,14-Sep-20,END,CE pens,CE_Pens
+6035,80381,14-Sep-20,END,CE pens,CE_Pens
+8239,80386,14-Sep-20,END,CE pens,CE_Pens
+9127,N/A,14-Sep-20,END,CE pens,CE_Pens
+9169,N/A,14-Sep-20,END,CE pens,CE_Pens
+143,80380,15-Sep-20,END,CE pens,CE_Pens
+941,80390,15-Sep-20,END,CE pens,CE_Pens
+5175,80378,15-Sep-20,END,CE pens,CE_Pens
+8172,80389,15-Sep-20,END,CE pens,CE_Pens
+8294,80385,15-Sep-20,END,CE pens,CE_Pens
