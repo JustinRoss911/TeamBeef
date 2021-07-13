@@ -1,31 +1,29 @@
 #Library Loading ----
 
 library(tidyverse)
-#library(anytime)
-#library(plyr)
-#library(dplyr)
-#library(readr)
 library(lubridate)
-#library(geosphere)
 library(rgdal)
 library(raster)
 library(sp)
+library(rgeos)
+
 #to remove all variables when needed
 #rm(list=ls())
-library(rgeos)
 
 source("loadData.R")
 
 #Testing Loading Code ---- 
 testFile <- loadData("gps", "gps/pre")
-testFile <- testFile[[1]]
-
-testGPS <- testFile[c('Longitude', "Latitude")]
+testGPS <- testFile[[1]]
+testGPS <- testGPS[c('Longitude', "Latitude")]
 coordinates(testGPS) <- cbind(testGPS$Longitude, testGPS$Latitude)
 
-directoryPath <- paste("raw/", "bounds/test", "/", sep="")
-fileList <- list.files(directoryPath)
-filePath <- paste(directoryPath, fileList[6], sep="")
+
+
+
+directoryPath <- "raw/bounds/test"
+fileList <- list.files(directoryPath, pattern = "\\.shp$")
+fileNames <- strsplit(fileList, "[.]")
 
 shape <- readOGR(dsn = directoryPath, layer = "CE_1")
 
@@ -62,6 +60,9 @@ proj4string(testGPS) <- proj4string(shape)
 t <- over(testGPS, shape)
 test <- t[!is.na(t$Shape_Leng),]
 
+test <- list()
+
+test[["Shape"]] <- shape
 
 plot(testGPS)
 plot(shape)
