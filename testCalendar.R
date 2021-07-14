@@ -7,17 +7,48 @@ library(ggplot2)
 library(forcats)
 library(scales)
 
+require(tidyverse)
+require(lubridate)
+require(rgdal)
+require(raster)
+require(sp)
+require(rgeos)
+
 source("loadData.R")
 #rm(list=ls())
 
+
+#Order of Ops
+#Load Data /
+#Filter Calendar /
+#Extract and Filter Bounds / 
+#Extract and Filter Errernous Dates
+#Update Fixes 
+#Update Summarization 
+#Combine Data-Frames 
+#Plot Previous 
+#Update Plots 
+
+
 gpsRawPre <- loadData("gps", "gps/pre")
 gpsCalendarPre <- filterCalendar(gpsRawPre)
-gpsFilteredPre <- speedAndTimeDifference(gpsCalendarPre)
+
+gpsOutBoundsPre <- extractOutBounds(gpsCalendarPre)
+gpsZerosPre <- extractZeroGPS(gpsOutBoundsPre)
+gpsOutBoundsPre <- filterZeroGPS(gpsOutBoundsPre)
+
+gpsInBoundsPre <- filterOutBounds(gpsCalendarPre)
+gpsFilteredPre <- speedAndTimeDifference(gpsInBoundsPre)
+
 gpsBadDatesPre <- extractErrenousDates(gpsFilteredPre)
 gpsFilteredPre <- filterErrenousDates(gpsFilteredPre)
 
+#The summarization and the fix check are not working as intended so, how do we make them work
+
 gpsResultsPre <- gpsFixCheck(gpsFilteredPre)
-gpsResultsPre <- gpsSummary(gpsResultsPre, gpsBadDatesPre)
+gpsSummaryPre <- gpsSummaryRaw(gpsResultsPre, gpsBadDatesPre)
+
+test <- gpsSummaryCombine(gpsSummaryPre, gpsZerosPre, gpsOutBoundsPre)
 
 
 
@@ -36,12 +67,7 @@ write.csv(gpsResultsPost, "F:/Development/Projects/Research/TeamBeef/workingProj
 
 
 #Testing Code ---- 
-test <- gpsSummary(gpsResultsPost, badDates)
 
-specie <- c(rep("sorgho" , 3) , rep("poacee" , 3) , rep("banana" , 3) , rep("triticum" , 3) )
-condition <- rep(c("normal" , "stress" , "Nitrogen") , 4)
-value <- abs(rnorm(12 , 0 , 15))
-data <- data.frame(specie,condition,value)
 
 
 #Calendar Loading Functions ----
@@ -114,50 +140,55 @@ speedAndTimeDifference <- function(dataIn)
   {
     copyFrame <- dataIn[[i]]
     
-    fileID <- levels(copyFrame$CollarID[1])
-    prefix <- "ID"
-    varname <- paste(prefix, fileID, sep="_")
-    
-    timeFirst <-  copyFrame[1:(nrow(copyFrame) - 1), ]
-    timeSecond <- copyFrame[2:nrow(copyFrame), ]
-    
-    p1 <-  copyFrame[1:(nrow(copyFrame) - 1), ]
-    p2 <- copyFrame[2:nrow(copyFrame), ]
-    
-    #Time Difference 
-    timeFirst <- as.numeric(timeFirst$DateTime)
-    timeSecond <- as.numeric(timeSecond$DateTime)
-    
-    time <- timeSecond - timeFirst
-    copyFrame <- copyFrame[2:nrow(copyFrame), ]
-    
-    copyFrame <- cbind(copyFrame, TimeDifference = time)
-    
-    #Speed
-    p1GPS <- p1 %>% select(Latitude, Longitude)
-    p2GPS <- p2 %>% select(Latitude, Longitude)
-
-    p1GPS <- p1GPS[c('Longitude', "Latitude")]
-    p2GPS <- p2GPS[c('Longitude', "Latitude")]
-
-    distance <- distGeo(p1GPS, p2GPS)
-    speed <- abs(distance / time)
-
-    copyFrame <- cbind(copyFrame, Speed = speed)
-    copyFrame$DateTime <- date(copyFrame$DateTime)
-    
-    #Loading In 
-    
-    logNames <- names(dataList) == varname
-    listSum <- sum(logNames)
-    
-    if(listSum > 0)
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
     {
-      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
-    }
-    else
-    {
-      dataList[[varname]] <- copyFrame
+      fileID <- levels(copyFrame$CollarID[1])
+      prefix <- "ID"
+      varname <- paste(prefix, fileID, sep="_")
+      
+      timeFirst <-  copyFrame[1:(nrow(copyFrame) - 1), ]
+      timeSecond <- copyFrame[2:nrow(copyFrame), ]
+      
+      p1 <-  copyFrame[1:(nrow(copyFrame) - 1), ]
+      p2 <- copyFrame[2:nrow(copyFrame), ]
+      
+      #Time Difference 
+      timeFirst <- as.numeric(timeFirst$DateTime)
+      timeSecond <- as.numeric(timeSecond$DateTime)
+      
+      time <- timeSecond - timeFirst
+      copyFrame <- copyFrame[2:nrow(copyFrame), ]
+      
+      copyFrame <- cbind(copyFrame, TimeDifference = time)
+      
+      #Speed
+      # p1GPS <- p1 %>% select(Latitude, Longitude)
+      # p2GPS <- p2 %>% select(Latitude, Longitude)
+  
+      p1GPS <- p1[c('Longitude', "Latitude")]
+      p2GPS <- p2[c('Longitude', "Latitude")]
+  
+      distance <- distGeo(p1GPS, p2GPS)
+      speed <- abs(distance / time)
+  
+      copyFrame <- cbind(copyFrame, Speed = speed)
+      copyFrame$DateTime <- date(copyFrame$DateTime)
+      
+      #Loading In 
+      
+      logNames <- names(dataList) == varname
+      listSum <- sum(logNames)
+      
+      if(listSum > 0)
+      {
+        dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+      }
+      else
+      {
+        dataList[[varname]] <- copyFrame
+      }
     }
   }
   return(dataList)
@@ -282,7 +313,7 @@ extractErrenousDates <- function(dataIn)
     prefix <- "ID"
     varname <- paste(prefix, fileID, sep="_")
     
-    copyFrame <- copyFrame[copyFrame$TimeDifference < 0 | copyFrame$TimeDifference >= 600,]
+    copyFrame <- copyFrame[copyFrame$TimeDifference < 0 | copyFrame$TimeDifference >= 3600,]
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -311,7 +342,7 @@ filterErrenousDates <- function(dataIn)
     prefix <- "ID"
     varname <- paste(prefix, fileID, sep="_")
     
-    copyFrame <- copyFrame[copyFrame$TimeDifference > 0 & copyFrame$TimeDifference < 600,]
+    copyFrame <- copyFrame[copyFrame$TimeDifference > 0 & copyFrame$TimeDifference < 3600,]
     
     logNames <- names(dataList) == varname
     listSum <- sum(logNames)
@@ -337,7 +368,7 @@ gpsFixCheck <- function(dataIn)
   for(j in 1:nrow(eventCalendar))
   {
     
-    outputFrame <- data.frame(Dates = character(0), Expected_Fixes = numeric(0), On_Time_Fix = numeric(0), No_Fix = numeric(0), Early_Fix = numeric(0), Late_Fix = numeric(0), Missing_Fix = numeric(0), Out_Bounds = numeric(0), CollarID = numeric(0), BullID = numeric(0))
+    outputFrame <- data.frame(Dates = character(0), Expected_Fixes = numeric(0), On_Time_Fix = numeric(0), Early_Fix = numeric(0), Late_Fix = numeric(0), Missing_Fix = numeric(0), CollarID = numeric(0), BullID = numeric(0))
     
     start <- eventCalendar$Collar_On[j] 
     end <- eventCalendar$Collar_Off[j]
@@ -359,8 +390,6 @@ gpsFixCheck <- function(dataIn)
       dateFrame <- copyFrame[copyFrame$DateTime == dateSequence$dates[i], ]
       expFix <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
       
-      
-      
       date <- dateSequence$dates[i]
 
       if(is.null(copyFrame))
@@ -368,38 +397,25 @@ gpsFixCheck <- function(dataIn)
       else if(nrow(copyFrame) == 0)
       {
         fix <- 0 
-        noFix <- 0 
         early <- 0 
         late <- 0 
         missing <- expFix
-        outBounds <- 0 
       }
       else if(nrow(copyFrame) > 0)
       {
-        withZero <- nrow(dateFrame)
-        withoutZero <- nrow(dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,])
-        noFix <- withZero - withoutZero
-        
-        dateFrame <- dateFrame[dateFrame$Latitude != 0 | dateFrame$Longitude != 0 | dateFrame$Altitude != 0,]
-        
-        
-        outBounds <- nrow(dateFrame[dateFrame$Speed > 10, ]) 
-        dateFrame <- dateFrame[dateFrame$Speed <= 10, ] 
-        
-        fix <- nrow(dateFrame[dateFrame$TimeDifference >= 240 & dateFrame$TimeDifference <= 360, ])
-        early <- nrow(dateFrame[dateFrame$TimeDifference < 240, ])
-        late <- nrow(dateFrame[dateFrame$TimeDifference > 360, ])
+        fix <- nrow(dateFrame[dateFrame$TimeDifference >= 270 & dateFrame$TimeDifference <= 330, ])
+        early <- nrow(dateFrame[dateFrame$TimeDifference < 270, ])
+        late <- nrow(dateFrame[dateFrame$TimeDifference > 330, ])
         
         missing <- expFix - (fix + early + late)
-        
       }
       
-      holdFrame <- data.frame(date, expFix, fix, noFix, early, late, missing, outBounds, CollarID, BullID)
+      holdFrame <- data.frame(date, expFix, fix, early, late, missing, CollarID, BullID)
       outputFrame <- rbind(outputFrame, holdFrame)
     }
     
     #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
-    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-07-13" & as.Date(outputFrame$date) <= "2020-09-20", ]
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-07-13", ]
     outputFrame <- arrange(outputFrame, date)
     
     logNames <- names(dataList) == varname
@@ -661,4 +677,356 @@ gpsSummary <- function(results, badDates)
   outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
   
   return(outputFrame)
+}
+
+gpsSummaryRaw <- function(results, badDates)
+{
+  outputFrame <- data.frame(CollarID = character(0), BullID = character(0), expFix = numeric(0), Fix = numeric(0), early = numeric(0), late = numeric(0), missing = numeric(0), errenousDates = numeric(0))
+  
+  
+  for(j in 1:length(results))
+  {
+    copyFrameResults <- results[[j]]
+    
+    CollarID <- as.factor(copyFrameResults$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrameDates <- badDates[[varname]]
+    
+    for(i in 1:length(levels(copyFrameResults$BullID)))
+    {
+      
+      BullID <- levels(copyFrameResults$BullID)
+      BullID <- BullID[i]
+      holdFrameResults <- copyFrameResults[copyFrameResults$BullID == BullID, ]
+      holdFrameDates <- copyFrameDates[copyFrameDates$BullID == BullID, ]
+      
+      if(is.null(holdFrameResults) | is.null(holdFrameDates))
+      {}
+      else if(nrow(holdFrameResults) == 0)
+      {
+        expFix <- 0
+        fix <- 0 
+        early <- 0 
+        late <- 0
+        missing <- 0
+        errenousDates <- nrow(holdFrameDates)
+      }
+      else if(nrow(holdFrameResults) > 0)
+      {
+        expFix <- sum(holdFrameResults$expFix)
+        fix <- sum(holdFrameResults$fix)
+        early <- sum(holdFrameResults$early) 
+        late <- sum(holdFrameResults$late)
+        missing <- sum(holdFrameResults$missing)
+        errenousDates <- nrow(holdFrameDates)
+      }
+      
+      #ID <- paste("CollarID", CollarID, "BullID", BullID, sep=" ")
+      
+      holdFrame <- data.frame(CollarID, BullID, expFix, fix, early, late, missing, errenousDates)
+      outputFrame <- rbind(outputFrame, holdFrame)
+    }
+  }
+  
+  # sumFix <- (outputFrame$fix + outputFrame$noFix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$outBounds + outputFrame$errenousDates)
+  # 
+  # outputFrame$fix <- outputFrame$fix / sumFix * 100
+  # outputFrame$noFix <- outputFrame$noFix / sumFix * 100
+  # outputFrame$early <- outputFrame$early / sumFix * 100
+  # outputFrame$late <- outputFrame$late / sumFix * 100
+  # outputFrame$missing <- outputFrame$missing / sumFix * 100
+  # outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
+  # outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+  
+  return(outputFrame)
+}
+
+gpsSummaryCombine <- function(data, zeros, outBounds)
+{
+  copyFrameZeros <- data.frame()
+  copyFrameOut <- data.frame()
+  
+  for(i in 1:nrow(data))
+  {
+    CollarID <- data$CollarID[i]
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    if(!is.null(zeros[[varname]]))
+    { holdZeros <- nrow(zeros[[varname]]) }
+    else
+      holdZeros <- 0 
+    
+    if(!is.null(outBounds[[varname]]))
+    { holdOut <- nrow(outBounds[[varname]]) }
+    else 
+      holdOut <- 0 
+    
+    copyFrameZeros <- rbind(copyFrameZeros, holdZeros)
+    copyFrameOut <- rbind(copyFrameOut, holdOut)
+    
+  }
+  
+  data <- cbind(data, copyFrameZeros)
+  data <- cbind(data, copyFrameOut)
+  
+  return(data)
+  
+}
+
+
+#GPS Out of Bounds ----
+filterOutBounds <- function(dataIn)
+{
+  movementCalendar <- loadMovement()
+  
+  shapes <- loadShapeFiles("raw/bounds")
+  sharedCRS <- proj4string(shapes[[1]])
+  
+  coords <- loadGPSCoords(dataIn, sharedCRS)
+  
+  dataList <- list()
+  
+  for(j in 1:nrow(movementCalendar))
+  {
+    copyCalendar <- movementCalendar[j, ]
+    
+    CollarID <- copyCalendar$Collar
+    BullID <- copyCalendar$Bull
+    pen <- copyCalendar$arcGISShapeFileName
+    
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrame <- dataIn[[varname]]
+    copyCoords <- coords[[varname]]
+    copyShape <- shapes[[pen]]
+    
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
+    {
+      #Will have to add when made into a full function
+      copyFrame <- copyFrame[copyFrame$BullID == BullID, ] 
+      
+      copyFrame <- copyFrame[copyCalendar$StartDate <= as.Date(copyFrame$DateTime) & copyCalendar$EndDate >= as.Date(copyFrame$DateTime), ]
+      
+      if(is.null(copyFrame))
+      {}
+      else if(nrow(copyFrame) > 0)
+      {
+        analyzedCoordinates <- over(copyCoords, copyShape)
+        
+        inBounds <- analyzedCoordinates[!is.na(analyzedCoordinates$Shape_Leng) | !is.na(analyzedCoordinates$Shape_Area),]
+        
+        index <- rownames(inBounds)
+        
+        outputFrame <- copyFrame[rownames(copyFrame) %in% index,]
+        
+        logNames <- names(dataList) == varname
+        listSum <- sum(logNames)
+        
+        if(listSum > 0)
+        {
+          dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+        }
+        else
+        {
+          dataList[[varname]] <- outputFrame
+        } 
+        
+      }
+    }
+  }
+  
+  return(dataList)
+}
+
+
+extractOutBounds <- function(dataIn)
+{
+  movementCalendar <- loadMovement()
+  
+  shapes <- loadShapeFiles("raw/bounds")
+  sharedCRS <- proj4string(shapes[[1]])
+  
+  coords <- loadGPSCoords(dataIn, sharedCRS)
+  
+  dataList <- list()
+  
+  for(j in 1:nrow(movementCalendar))
+  {
+    copyCalendar <- movementCalendar[j, ]
+    
+    CollarID <- copyCalendar$Collar
+    BullID <- copyCalendar$Bull
+    pen <- copyCalendar$arcGISShapeFileName
+    
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrame <- dataIn[[varname]]
+    copyCoords <- coords[[varname]]
+    copyShape <- shapes[[pen]]
+    
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
+    {
+      #Will have to add when made into a full function
+      copyFrame <- copyFrame[copyFrame$BullID == BullID, ] 
+      
+      copyFrame <- copyFrame[copyCalendar$StartDate <= as.Date(copyFrame$DateTime) & copyCalendar$EndDate >= as.Date(copyFrame$DateTime), ]
+      
+      if(is.null(copyFrame))
+      {}
+      else if(nrow(copyFrame) > 0)
+      {
+        analyzedCoordinates <- over(copyCoords, copyShape)
+        
+        inBounds <- analyzedCoordinates[is.na(analyzedCoordinates$Shape_Leng) | is.na(analyzedCoordinates$Shape_Area),]
+        
+        index <- rownames(inBounds)
+        
+        outputFrame <- copyFrame[rownames(copyFrame) %in% index,]
+        
+        logNames <- names(dataList) == varname
+        listSum <- sum(logNames)
+        
+        if(listSum > 0)
+        {
+          dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+        }
+        else
+        {
+          dataList[[varname]] <- outputFrame
+        } 
+        
+      }
+    }
+  }
+  
+  return(dataList)
+}
+
+#Loading Movement Callendar ----
+loadMovement <- function()
+{
+  directoryPath <- paste("raw/", "events", "/", sep="")
+  fileList <- list.files(directoryPath)
+  filePath <- paste(directoryPath, fileList[2], sep="") 
+  
+  pens <- read.csv(filePath, stringsAsFactors = FALSE)
+  pens$EndDate[pens$EndDate == "END"] <- '20-Sep-20'
+  
+  pens$EndDate <- as.Date(pens$EndDate, format = '%d-%b-%y')
+  pens$StartDate <- as.Date(pens$StartDate, format = '%d-%b-%y')
+  
+  pens <- pens[pens$Collar != "N/A",] 
+  
+  return(pens)
+}
+
+
+#Loading Shape Functions ---- 
+loadShapeFiles <- function(path)
+{
+  directoryPath <- path
+  fileList <- list.files(directoryPath, pattern = "\\.shp$")
+  fileNames <- strsplit(fileList, "[.]")
+  
+  shapeList <- list()
+  
+  for(i in 1:length(fileNames))
+  {
+    name <- fileNames[[i]][1]
+    shapeList[[name]] <- readOGR(dsn = directoryPath, layer = name)
+  }
+  
+  return(shapeList)
+}
+
+
+#GPS Coordinate Change ----
+loadGPSCoords <- function(dataIn, sharedCRS)
+{
+  dataNames <- names(dataIn)
+  gpsCoordiantes <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    name <- dataNames[i]
+    copyFrame <- dataIn[[name]]
+    
+    copyFrame <- copyFrame[c('Longitude', "Latitude")]
+    coordinates(copyFrame) <- cbind(copyFrame$Longitude, copyFrame$Latitude)
+    
+    proj4string(copyFrame) <- sharedCRS
+    
+    gpsCoordiantes[[name]] <- copyFrame
+  }
+  
+  return(gpsCoordiantes)
+}
+
+
+#GPS Zero Extraction & Filtering ----
+extractZeroGPS <- function(dataIn) 
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    copyFrame <- copyFrame[copyFrame$Latitude == 0 | copyFrame$Longitude == 0 | copyFrame$Altitude == 0,]
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }   
+  }
+  return(dataList)
+}
+
+filterZeroGPS <- function(dataIn) 
+{
+  dataList <- list()
+  
+  for(i in 1:length(dataIn))
+  {
+    copyFrame <- dataIn[[i]]
+    
+    fileID <- levels(copyFrame$CollarID[1])
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    copyFrame <- copyFrame[copyFrame$Latitude != 0 | copyFrame$Longitude != 0 | copyFrame$Altitude != 0,]
+    
+    logNames <- names(dataList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      dataList[[varname]] <- rbind(dataList[[varname]], copyFrame)
+    }
+    else
+    {
+      dataList[[varname]] <- copyFrame
+    }   
+  }
+  return(dataList)
 }

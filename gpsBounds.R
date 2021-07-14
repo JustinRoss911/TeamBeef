@@ -29,53 +29,135 @@ rawData <- dataIn
 coords <- gpsCoords
 shapes <- shapeList
 
-dataList <- list()
+test1 <- extractOutBounds(dataIn)
 
-for(j in 1:nrow(movementCalendar))
+filterOutBounds <- function(dataIn)
 {
-  copyCalendar <- movementCalendar[j, ]
+  shapes <- loadShapeFiles("raw/bounds")
+  sharedCRS <- proj4string(shapeList[[1]])
   
-  CollarID <- copyCalendar$Collar
-  BullID <- copyCalendar$Bull
-  pen <- copyCalendar$arcGISShapeFileName
+  coords <- loadGPSCoords(dataIn, sharedCRS)
   
-  prefix <- "ID"
-  varname <- paste(prefix, CollarID, sep="_")
+  dataList <- list()
   
-  copyFrame <- rawData[[varname]]
-  
-  
-  if(is.null(copyFrame))
-  {}
-  else if(nrow(copyFrame) > 0)
+  for(j in 1:nrow(movementCalendar))
   {
-    copyFrame <- copyFrame[copyCalendar$StartDate <= as.Date(copyFrame$DateTime) & copyCalendar$EndDate >= as.Date(copyFrame$DateTime),]
-    #Will have to add when made into a full function
-    #copyFrame <- copyFrame[copyFrame$BullID == BullID, ] 
+    copyCalendar <- movementCalendar[j, ]
     
+    CollarID <- copyCalendar$Collar
+    BullID <- copyCalendar$Bull
+    pen <- copyCalendar$arcGISShapeFileName
+    
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrame <- dataIn[[varname]]
     copyCoords <- coords[[varname]]
     copyShape <- shapes[[pen]]
     
-    analyzedCoordinates <- over(copyCoords, copyShape)
-    
-    inBounds <- analyzedCoordinates[is.na(analyzedCoordinates$Shape_Leng) | is.na(analyzedCoordinates$Shape_Area),]
-    
-    index <- rownames(inBounds)
-    
-    outputFrame <- copyFrame[rownames(copyFrame) %in% index,]
-    
-    logNames <- names(dataList) == varname
-    listSum <- sum(logNames)
-    
-    if(listSum > 0)
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
     {
-      dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+      #Will have to add when made into a full function
+      #copyFrame <- copyFrame[copyFrame$BullID == BullID, ] 
+      
+      copyFrame <- copyFrame[copyCalendar$StartDate <= as.Date(copyFrame$DateTime) & copyCalendar$EndDate >= as.Date(copyFrame$DateTime), ]
+
+      if(is.null(copyFrame))
+      {}
+      else if(nrow(copyFrame) > 0)
+      {
+        analyzedCoordinates <- over(copyCoords, copyShape)
+        
+        inBounds <- analyzedCoordinates[!is.na(analyzedCoordinates$Shape_Leng) | !is.na(analyzedCoordinates$Shape_Area),]
+        
+        index <- rownames(inBounds)
+        
+        outputFrame <- copyFrame[rownames(copyFrame) %in% index,]
+        
+        logNames <- names(dataList) == varname
+        listSum <- sum(logNames)
+        
+        if(listSum > 0)
+        {
+          dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+        }
+        else
+        {
+          dataList[[varname]] <- outputFrame
+        } 
+      
+      }
     }
-    else
-    {
-      dataList[[varname]] <- outputFrame
-    }    
   }
+  
+  return(dataList)
+}
+
+
+extractOutBounds <- function(dataIn)
+{
+  shapes <- loadShapeFiles("raw/bounds")
+  sharedCRS <- proj4string(shapeList[[1]])
+  
+  coords <- loadGPSCoords(dataIn, sharedCRS)
+  
+  dataList <- list()
+  
+  for(j in 1:nrow(movementCalendar))
+  {
+    copyCalendar <- movementCalendar[j, ]
+    
+    CollarID <- copyCalendar$Collar
+    BullID <- copyCalendar$Bull
+    pen <- copyCalendar$arcGISShapeFileName
+    
+    prefix <- "ID"
+    varname <- paste(prefix, CollarID, sep="_")
+    
+    copyFrame <- dataIn[[varname]]
+    copyCoords <- coords[[varname]]
+    copyShape <- shapes[[pen]]
+    
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
+    {
+      #Will have to add when made into a full function
+      #copyFrame <- copyFrame[copyFrame$BullID == BullID, ] 
+      
+      copyFrame <- copyFrame[copyCalendar$StartDate <= as.Date(copyFrame$DateTime) & copyCalendar$EndDate >= as.Date(copyFrame$DateTime), ]
+      
+      if(is.null(copyFrame))
+      {}
+      else if(nrow(copyFrame) > 0)
+      {
+        analyzedCoordinates <- over(copyCoords, copyShape)
+        
+        inBounds <- analyzedCoordinates[is.na(analyzedCoordinates$Shape_Leng) | is.na(analyzedCoordinates$Shape_Area),]
+        
+        index <- rownames(inBounds)
+        
+        outputFrame <- copyFrame[rownames(copyFrame) %in% index,]
+        
+        logNames <- names(dataList) == varname
+        listSum <- sum(logNames)
+        
+        if(listSum > 0)
+        {
+          dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
+        }
+        else
+        {
+          dataList[[varname]] <- outputFrame
+        } 
+        
+      }
+    }
+  }
+  
+  return(dataList)
 }
 
 #Testing Working Code ---- 
