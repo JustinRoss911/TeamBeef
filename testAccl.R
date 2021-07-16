@@ -11,7 +11,7 @@ source("loadData.R")
 #rm(list=ls())
 
 #Data Loading ----
-acclRaw <- loadData("accl", "accl/post")
+acclRaw <- loadData("accl", "accl/combined")
 acclRaw <- filterCalendar(acclRaw)
 
 acclRaw <- timeDifference(acclRaw)
@@ -24,6 +24,13 @@ write.csv(acclResults, "F:/Development/Projects/Research/TeamBeef/workingProject
 
 save(acclResults, file="acclResults.RData")
 save(acclBadDates, file="acclBadDates.RData")
+
+
+#New Test Code ----
+filePath <- "raw/accl/combined/PinPoint 80379 2020-11-09 13-05-23 Part2.csv" #"raw/accl/combined/PinPoint 80380 2020-11-09 13-18-55 Part1.csv"
+copyFrameNew <- read.csv(filePath, header = F, stringsAsFactors = FALSE)
+
+
 
 # test <- list()
 # t <- acclRaw[[1]]

@@ -806,16 +806,16 @@ gpsSummaryRaw <- function(results, badDates, zeros, out)
     }
     
   }
-  
-  sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
-
-  outputFrame$fix <- outputFrame$fix / sumFix * 100
-  outputFrame$early <- outputFrame$early / sumFix * 100
-  outputFrame$late <- outputFrame$late / sumFix * 100
-  outputFrame$missing <- outputFrame$missing / sumFix * 100
-  outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
-  outputFrame$noFix <- outputFrame$noFix / sumFix * 100
-  outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
+  # 
+  # sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
+  # 
+  # outputFrame$fix <- outputFrame$fix / sumFix * 100
+  # outputFrame$early <- outputFrame$early / sumFix * 100
+  # outputFrame$late <- outputFrame$late / sumFix * 100
+  # outputFrame$missing <- outputFrame$missing / sumFix * 100
+  # outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+  # outputFrame$noFix <- outputFrame$noFix / sumFix * 100
+  # outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
   
   return(outputFrame)
 }
@@ -827,14 +827,14 @@ gpsSummaryCombine <- function(data1, data2)
   fix <- data1$fix + data2$fix
   early <- data1$early + data2$early
   late <- data1$late + data2$late
-  missing <- abs(data1$missing + data2$missing)
+  missing <- data1$missing + data2$missing
   errenousDates <- data1$errenousDates + data2$errenousDates
   noFix <- data1$noFix + data2$noFix
   outBounds <- data1$outBounds + data2$outBounds
   # 
   outputFrame <- data.frame(ID, expFix, fix, early, late, missing, errenousDates, noFix, outBounds)
   # 
-  sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + outputFrame$missing + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
+  sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
   #
   outputFrame$fix <- outputFrame$fix / sumFix * 100
   outputFrame$early <- outputFrame$early / sumFix * 100

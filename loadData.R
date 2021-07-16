@@ -9,6 +9,7 @@ loadData <- function(type, path)
   for(i in 1:length(fileList))
   {
     filePath <- paste(directoryPath, fileList[i], sep="") 
+    print(filePath)
     copyFrame <- read.csv(filePath, header = F, stringsAsFactors = FALSE)
     fileID <- as.integer(substr(copyFrame$V1[2], 13, 17))
     
@@ -53,11 +54,23 @@ loadData <- function(type, path)
     }
     else if(type == "accl")
     {
-      colnames(copyFrame) <- c("DateTime", "X", "Y", "Z", "Temperature")
+      if(length(copyFrame) == 5)
+      {
+        colnames(copyFrame) <- c("DateTime", "X", "Y", "Z", "Temperature")
+      }
+      else if(length(copyFrame) == 4)
+      {
+        colnames(copyFrame) <- c("DateTime", "X", "Y", "Temperature")
+      }
       
       copyFrame$X <- as.numeric(copyFrame$X) * 0.31392 
       copyFrame$Y <- as.numeric(copyFrame$Y) * 0.31392 
-      copyFrame$Z <- as.numeric(copyFrame$Z) * 0.31392 
+      
+      if(!is.null(copyFrame$Z))
+      {
+        copyFrame$Z <- as.numeric(copyFrame$Z) * 0.31392 
+      }
+           
       copyFrame$Temperature <- as.numeric(copyFrame$Temperature)
       
       # ForceSum <- sqrt(copyFrame$X^2 + copyFrame$Y^2 + copyFrame$Z^2)
