@@ -444,9 +444,9 @@ gpsFixCheck <- function(dataIn)
       }
       else if(nrow(copyFrame) > 0)
       {
-        fix <- nrow(dateFrame[dateFrame$TimeDifference >= 270 & dateFrame$TimeDifference <= 330, ])
-        early <- nrow(dateFrame[dateFrame$TimeDifference < 270, ])
-        late <- nrow(dateFrame[dateFrame$TimeDifference > 330, ])
+        fix <- nrow(dateFrame[dateFrame$TimeDifference >= 300 & dateFrame$TimeDifference <= 370, ])
+        early <- nrow(dateFrame[dateFrame$TimeDifference < 300, ])
+        late <- nrow(dateFrame[dateFrame$TimeDifference > 370, ])
         
         missing <- expFix - (fix + early + late)
       }

@@ -6,6 +6,7 @@ library(dplyr)
 library(ggplot2)
 library(forcats)
 library(scales)
+library(reshape2)
 
 source("loadData.R")
 #rm(list=ls())
@@ -20,6 +21,10 @@ acclRaw <- filterErrenousDates(acclRaw)
 #Test Code ----
 
 acclResults <- acclAnalysis(acclRaw)
+
+summary <- acclSummaryRaw(acclResults, acclBadDates)
+
+
 write.csv(acclResults, "F:/Development/Projects/Research/TeamBeef/workingProject/output/acclResults.csv", row.names = FALSE)
 
 save(acclResults, file="acclResults.RData")
@@ -30,86 +35,33 @@ save(acclBadDates, file="acclBadDates.RData")
 filePath <- "raw/accl/combined/PinPoint 80379 2020-11-09 13-05-23 Part2.csv" #"raw/accl/combined/PinPoint 80380 2020-11-09 13-18-55 Part1.csv"
 copyFrameNew <- read.csv(filePath, header = F, stringsAsFactors = FALSE)
 
+testCal <- extractCalendar(acclRaw)
+
+copyFrame <- acclRaw[[1]]
 
 
-# test <- list()
-# t <- acclRaw[[1]]
-# test[["ID_80379"]] <- t
-# 
-# ye <- acclAnalysis(dataIn)
-# 
-# eventCalendar <- loadCalendar()
-# dataList <- list()
-# 
-# dataIn <- test
-# 
-# for(j in 1:nrow(eventCalendar))
-# {
-#   outputFrame <- data.frame(Dates = character(0), expRecording = numeric(0), recordings = numeric(0), early = numeric(0), late = numeric(0), missing = numeric(0), CollarID = numeric(0), BullID = numeric(0))
-#   
-#   start <- eventCalendar$Collar_On[j] 
-#   end <- eventCalendar$Collar_Off[j]
-#   
-#   expectedFixes <- data.frame(dates = seq(start, end, by = 2))
-#   dateSequence <- data.frame(dates = seq(as.Date(start), as.Date(end), by="days"))
-#   
-#   CollarID <- as.factor(eventCalendar$Collar_ID[j])
-#   BullID <- as.factor(eventCalendar$Bull_ID[j])
-#   
-#   prefix <- "ID"
-#   varname <- paste(prefix, CollarID, sep="_")
-#   
-#   copyFrame <- dataIn[[varname]]
-#   
-#   
-#   for(i in 1:nrow(dateSequence))
-#   {
-#     dateFrame <- copyFrame[copyFrame$DateTime == as.numeric(dateSequence$dates[i]), ]
-#     expRecording <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
-#     
-#     date <- dateSequence$dates[i]
-#     
-#     if(is.null(copyFrame))
-#     {}
-#     else if(nrow(copyFrame) == 0)
-#     {
-#       recordings <- 0 
-#       early <- 0 
-#       late <- 0 
-#       missing <- expRecording
-#     }
-#     else if(nrow(copyFrame) > 0)
-#     {
-#       recordings <- nrow(dateFrame[dateFrame$TimeDifference == 2, ])
-#       early <- nrow(dateFrame[dateFrame$TimeDifference < 2, ])
-#       late <- nrow(dateFrame[dateFrame$TimeDifference > 2, ])
-#       
-#       missing <- expRecording - (recordings + early + late) 
-#       
-#     }
-#     
-#     holdFrame <- data.frame(date, expRecording, recordings, early, late, missing, CollarID, BullID)
-#     outputFrame <- rbind(outputFrame, holdFrame)
-#   }
-#   
-#   #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
-#   outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-06-18" & as.Date(outputFrame$date) <= "2020-09-20", ]
-#   outputFrame <- arrange(outputFrame, date)
-#   
-#   logNames <- names(dataList) == varname
-#   listSum <- sum(logNames)
-#   
-#   if(listSum > 0)
-#   {
-#     dataList[[varname]] <- rbind(dataList[[varname]], outputFrame)
-#   }
-#   else
-#   {
-#     dataList[[varname]] <- outputFrame
-#   }   
-# }  
+mycol <- rgb(0, 0, 255, max = 255, alpha = 125, names = "blue50")
+c1 <- rgb(173,216,230,max = 255, alpha = 80, names = "lt.blue")
+c2 <- rgb(255,192,203, max = 255, alpha = 80, names = "lt.pink")
+
+axis <- copyFrame[c('X', "Y", "Z")]
+normalizedAxis <- data.frame(X = rnorm(axis$X), Y = rnorm(axis$Y), Z = rnorm(axis$Z))
+test <- melt(axis)
+test2 <- melt(copyFrame[c('X', "Y", "Z")])
+
+hgX <- boxplot(normalizedAxis$X)
+par(new = TRUE)
+hgY <- boxplot(normalizedAxis$Y)
+hgZ <- hist(normalizedAxis$Z)
 
 
+plot(hgX, col = c1) 
+plot(hgY, col = c2, add = T)
+plot(hgZ, col = mycol, add = T)
+
+
+ggplot1 <- ggplot(test2, aes(x = variable, y = value)) + geom_boxplot()
+ggplot2 <- ggplot(test2, aes(x = variable, y = value)) + geom_boxplot()
 
 
 #Calendar Loading Functions ----
@@ -146,7 +98,61 @@ filterCalendar <- function(dataIn)
     varname <- paste(prefix, fileID, sep="_")
     
     copyFrame <- dataIn[[varname]]
-    copyFrame <- copyFrame[onTime < copyFrame$DateTime & offTime > copyFrame$DateTime, ]
+    copyFrame <- copyFrame[onTime <= copyFrame$DateTime & offTime >= copyFrame$DateTime, ]
+    
+    if(is.null(copyFrame))
+    {}
+    else if(nrow(copyFrame) > 0)
+    {
+      copyFrame <- transform(copyFrame, BullID = BullID)
+      
+      logNames <- names(eventList) == varname
+      listSum <- sum(logNames)
+      
+      if(listSum > 0)
+      {
+        eventList[[varname]] <- rbind(eventList[[varname]], copyFrame)
+      }
+      else
+      {
+        eventList[[varname]] <- copyFrame
+      }
+    }
+    
+  }
+  
+  return(eventList)
+}
+
+extractCalendar <- function(dataIn)
+{
+  eventCalendar <- loadCalendar()
+  eventList <- list()
+  
+  
+  for(i in 1:nrow(eventCalendar))
+  {
+    onTime <- eventCalendar$Collar_On[i]
+    offTime <- eventCalendar$Collar_Off[i]
+    fileID <- as.factor(eventCalendar$Collar_ID[i])
+    BullID <- as.factor(eventCalendar$Bull_ID[i])
+    
+    prefix <- "ID"
+    varname <- paste(prefix, fileID, sep="_")
+    
+    logNames <- names(eventList) == varname
+    listSum <- sum(logNames)
+    
+    if(listSum > 0)
+    {
+      copyFrame <- eventList[[varname]]
+    }
+    else
+    {
+      copyFrame <- dataIn[[varname]]
+    }
+
+    copyFrame <- copyFrame[onTime >= copyFrame$DateTime | offTime <= copyFrame$DateTime, ]
     
     if(is.null(copyFrame))
     {}
@@ -597,7 +603,7 @@ acclAnalysis <- function(dataIn)
   
   for(j in 1:nrow(eventCalendar))
   {
-    outputFrame <- data.frame(Dates = character(0), expRecording = numeric(0), recordings = numeric(0), early = numeric(0), late = numeric(0), missing = numeric(0), CollarID = numeric(0), BullID = numeric(0))
+    outputFrame <- data.frame(Dates = character(0), expextedRec = numeric(0), recordings = numeric(0), unexpectedRec = numeric(0), missing = numeric(0), CollarID = numeric(0), BullID = numeric(0))
     
     start <- eventCalendar$Collar_On[j] 
     end <- eventCalendar$Collar_Off[j]
@@ -616,31 +622,32 @@ acclAnalysis <- function(dataIn)
     
     for(i in 1:nrow(dateSequence))
     {
-      dateFrame <- copyFrame[copyFrame$DateTime == as.numeric(dateSequence$dates[i]), ]
-      expRecording <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
+      dateFrame <- copyFrame[copyFrame$DateTime == dateSequence$dates[i], ]
+      expextedRec <- length(expectedFixes[as.Date(expectedFixes$dates) == dateSequence$dates[i], ] )
       
       date <- dateSequence$dates[i]
       
       if(is.null(copyFrame))
-      {}
+      {
+        recordings <- 0 
+        unexpectedRec <- 0 
+        missing <- expextedRec
+      }
       else if(nrow(copyFrame) == 0)
       {
         recordings <- 0 
-        early <- 0 
-        late <- 0 
-        missing <- expRecording
+        unexpectedRec <- 0 
+        missing <- expextedRec
       }
       else if(nrow(copyFrame) > 0)
       {
         recordings <- nrow(dateFrame[dateFrame$TimeDifference == 2, ])
-        early <- nrow(dateFrame[dateFrame$TimeDifference < 2, ])
-        late <- nrow(dateFrame[dateFrame$TimeDifference > 2, ])
+        unexpectedRec <- nrow(dateFrame[dateFrame$TimeDifference != 2, ])
         
-        missing <- expRecording - (recordings + early + late) 
-        
+        missing <- expextedRec - (recordings + unexpectedRec)
       }
       
-      holdFrame <- data.frame(date, expRecording, recordings, early, late, missing, CollarID, BullID)
+      holdFrame <- data.frame(date, expextedRec, recordings, unexpectedRec, missing, CollarID, BullID)
       outputFrame <- rbind(outputFrame, holdFrame)
     }
     
@@ -664,70 +671,72 @@ acclAnalysis <- function(dataIn)
 }
 
 #Summarization ----
-gpsSummary <- function(results, badDates)
+acclSummaryRaw <- function(results, badDates, zeros, out)
 {
-  outputFrame <- data.frame(ID = character(0), expFix = numeric(0), Fix = numeric(0), noFix = numeric(0), early = numeric(0), late = numeric(0), missing = numeric(0), outBounds = numeric(0), errenousDates = numeric(0))
-  
+  outputFrame <- data.frame(Dates = character(0), expextedRec = numeric(0), recordings = numeric(0), unexpectedRec = numeric(0), missing = numeric(0), CollarID = numeric(0), BullID = numeric(0))
   
   for(j in 1:length(results))
   {
-    copyFrameResults <- results[[j]]
+    copyFrame <- results[[j]]
     
-    CollarID <- as.factor(copyFrameResults$CollarID[1])
-    prefix <- "ID"
-    varname <- paste(prefix, CollarID, sep="_")
-    
-    copyFrameDates <- badDates[[varname]]
-    
-    for(i in 1:length(levels(copyFrameResults$BullID)))
+    for(i in 1:length(levels(copyFrame$BullID)))
     {
+      CollarID <- levels(copyFrame$CollarID)
+      CollarID <- CollarID[1]
+      prefix <- "ID"
+      varname <- paste(prefix, CollarID, sep="_")
       
-      BullID <- levels(copyFrameResults$BullID)
+      BullID <- levels(copyFrame$BullID)
       BullID <- BullID[i]
-      holdFrameResults <- copyFrameResults[copyFrameResults$BullID == BullID, ]
-      holdFrameDates <- copyFrameDates[copyFrameDates$BullID == BullID, ]
       
-      if(is.null(holdFrameResults) | is.null(holdFrameDates))
-      {}
-      else if(nrow(holdFrameResults) == 0)
+      copyFrameDates <- badDates[[varname]]
+      copyFrameDates <- copyFrameDates[copyFrameDates$BullID == BullID, ]
+      
+      copyFrameResults <- copyFrame[copyFrame$BullID == BullID, ]
+      
+      if(is.null(copyFrameResults) | nrow(copyFrameResults) == 0) 
       {
-        expFix <- 0
-        fix <- 0 
-        noFix <- 0 
-        early <- 0 
-        late <- 0
+        expextedRec <- 0 
+        recordings <- 0 
+        unexpectedRec <- 0 
         missing <- 0
-        outBounds <- 0 
-        errenousDates <- nrow(holdFrameDates)
       }
-      else if(nrow(holdFrameResults) > 0)
+      else 
       {
-        expFix <- sum(holdFrameResults$expFix)
-        fix <- sum(holdFrameResults$fix)
-        noFix <- sum(holdFrameResults$noFix) 
-        early <- sum(holdFrameResults$early) 
-        late <- sum(holdFrameResults$late)
-        missing <- sum(holdFrameResults$missing)
-        outBounds <- sum(holdFrameResults$outBounds)
-        errenousDates <- nrow(holdFrameDates)
+        expextedRec <- sum(copyFrameResults$expextedRec)
+        recordings <- sum(copyFrameResults$recordings)
+        unexpectedRec <- sum(copyFrameResults$unexpectedRec) 
       }
+      
+      if(is.null(copyFrameDates)) 
+      {
+        errenousDates <- 0 
+      }
+      else 
+      {
+        errenousDates <- nrow(copyFrameDates)
+      }
+      
+      missing <- expextedRec - (recordings + unexpectedRec + errenousDates)
       
       ID <- paste("CollarID", CollarID, "BullID", BullID, sep=" ")
       
-      holdFrame <- data.frame(ID, expFix, fix, noFix, early, late, missing, outBounds, errenousDates)
+      holdFrame <- data.frame(ID, expextedRec, recordings, unexpectedRec, missing, errenousDates)
       outputFrame <- rbind(outputFrame, holdFrame)
+      
     }
+    
   }
-  
-  sumFix <- (outputFrame$fix + outputFrame$noFix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$outBounds + outputFrame$errenousDates)
-  
-  outputFrame$fix <- outputFrame$fix / sumFix * 100
-  outputFrame$noFix <- outputFrame$noFix / sumFix * 100
-  outputFrame$early <- outputFrame$early / sumFix * 100
-  outputFrame$late <- outputFrame$late / sumFix * 100
-  outputFrame$missing <- outputFrame$missing / sumFix * 100
-  outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
-  outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+  # 
+  # sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
+  # 
+  # outputFrame$fix <- outputFrame$fix / sumFix * 100
+  # outputFrame$early <- outputFrame$early / sumFix * 100
+  # outputFrame$late <- outputFrame$late / sumFix * 100
+  # outputFrame$missing <- outputFrame$missing / sumFix * 100
+  # outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+  # outputFrame$noFix <- outputFrame$noFix / sumFix * 100
+  # outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
   
   return(outputFrame)
 }
