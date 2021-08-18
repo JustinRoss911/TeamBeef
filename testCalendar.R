@@ -13,6 +13,7 @@ require(rgdal)
 require(raster)
 require(sp)
 require(rgeos)
+require(geosphere)
 
 source("loadData.R")
 #rm(list=ls())
@@ -30,21 +31,30 @@ source("loadData.R")
 #Update Plots 
 
 
-gpsRawPre <- loadData("gps", "gps/pre")
-gpsCalendarPre <- filterCalendar(gpsRawPre)
+gpsRaw <- loadData("gps", "gps/calf")
+gpsCalendar <- filterCalendar(gpsRaw)
 
-gpsOutBoundsPre <- extractOutBounds(gpsCalendarPre)
-gpsZerosPre <- extractZeroGPS(gpsOutBoundsPre)
-gpsOutBoundsPre <- filterZeroGPS(gpsOutBoundsPre)
+#gpsOutBounds <- extractOutBounds(gpsCalendar)
+#gpsZeros <- extractZeroGPS(gpsOutBounds)
+gpsZeros <- extractZeroGPS(gpsCalendar)
+#gpsOutBounds <- filterZeroGPS(gpsOutBounds)
 
-gpsInBoundsPre <- filterOutBounds(gpsCalendarPre)
-gpsFilteredPre <- speedAndTimeDifference(gpsInBoundsPre)
+#gpsInBounds <- filterOutBounds(gpsCalendar)
+#gpsFiltered <- speedAndTimeDifference(gpsInBounds)
+gpsFiltered <- speedAndTimeDifference(gpsCalendar)
 
-gpsBadDatesPre <- extractErrenousDates(gpsFilteredPre)
-gpsFilteredPre <- filterErrenousDates(gpsFilteredPre)
+gpsBadDates <- extractErrenousDates(gpsFiltered)
+gpsFiltered <- filterErrenousDates(gpsFiltered)
 
-gpsResultsPre <- gpsFixCheck(gpsFilteredPre)
-#gpsSummaryPre <- gpsSummaryRaw(gpsResultsPre, gpsBadDatesPre, gpsZerosPre, gpsOutBoundsPre)
+gpsResults <- gpsFixCheck(gpsFiltered)
+
+gpsSummary <- gpsSummaryRaw(gpsResults, gpsBadDates, gpsZeros, NULL)
+
+# run code below if percentage section is commented out of gpsSummaryRaw function
+write.csv(gpsSummary, "output/GPS.csv", row.names = FALSE)
+
+# run code below if percentage section is not commented out of gpsSummaryRaw function
+write.csv(gpsSummary, "output/percentageGPS.csv", row.names = FALSE)
 
 # -------------------------------------------------- #
 
@@ -66,7 +76,7 @@ gpsResultsPost <- gpsFixCheck(gpsFilteredPost)
 
 # -------------------------------------------------- #
 
-gpsSummaryPre <- gpsSummaryRaw(gpsResultsPre, gpsBadDatesPre, gpsZerosPre, gpsOutBoundsPre)
+gpsSummaryPre <- gpsSummaryRaw(gpsResults, gpsBadDates, gpsZeros, gpsOutBounds)
 gpsSummaryPost <- gpsSummaryRaw(gpsResultsPost, gpsBadDatesPost, gpsZerosPost, gpsOutBoundsPost)
 
 gpsSummaryPost <- gpsSummaryPost[-c(3), ]
@@ -456,7 +466,7 @@ gpsFixCheck <- function(dataIn)
     }
     
     #change date when dealing with pre-breeding season 2020-06-18, 07-13 and 09-20
-    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2020-07-13" & as.Date(outputFrame$date) <= "2020-09-20", ]
+    outputFrame <- outputFrame[as.Date(outputFrame$date) >= "2021-05-27" & as.Date(outputFrame$date) <= "2021-06-17", ]
     outputFrame <- arrange(outputFrame, date)
     
     logNames <- names(dataList) == varname
@@ -493,9 +503,9 @@ gpsHistograms <- function(dataIn)
       BullID <- BullID[i]
       copyFrame <- copyFrame[copyFrame$BullID == BullID, ]
       
-      titleFix <- paste("Collar", CollarID, "Bull", BullID, "Histogram of Fix Rate", sep=" ")
-      titleNoFix <- paste("Collar", CollarID, "Bull", BullID, "Histogram of No Fix Rate", sep=" ")
-      titleMissing <- paste("Collar", CollarID, "Bull", BullID, "Histogram of Missing Fix Rate", sep=" ")
+      titleFix <- paste("Collar", CollarID, "Calf", BullID, "Histogram of Fix Rate", sep=" ")
+      titleNoFix <- paste("Collar", CollarID, "Calf", BullID, "Histogram of No Fix Rate", sep=" ")
+      titleMissing <- paste("Collar", CollarID, "Calf", BullID, "Histogram of Missing Fix Rate", sep=" ")
       
       #The Freedman-Diaconis RUle for Bin Width Calculation 
       # x <- copyFrame$missing
@@ -560,7 +570,7 @@ gpsPie <- function(dataIn)
       data$label <- paste0(data$label, "%")
       
       
-      title <- paste("Collar", CollarID, "Bull", BullID, "Pie Chart Average % Summary Post-Breeding", sep=" ")
+      title <- paste("Collar", CollarID, "Calf", BullID, "Pie Chart Average % Summary", sep=" ")
       
       p <- ggplot(data,aes(x=1,y=values,fill=Type)) + geom_bar(stat="identity", color = "black")
       
@@ -766,7 +776,7 @@ gpsSummaryRaw <- function(results, badDates, zeros, out)
         fix <- sum(copyFrameResults$fix)
         early <- sum(copyFrameResults$early) 
         late <- sum(copyFrameResults$late)
-       # missing <- sum(copyFrameResults$missing)
+        missing <- sum(copyFrameResults$missing)
       }
       
       if(is.null(copyFrameDates)) 
@@ -796,9 +806,9 @@ gpsSummaryRaw <- function(results, badDates, zeros, out)
         outBounds <- nrow(copyFrameOut)
       }
       
-      missing <- expFix - (fix + early + late + errenousDates + noFix + outBounds)
+      missing <- abs(expFix - (fix + early + late + errenousDates + noFix + outBounds))
       
-      ID <- paste("CollarID", CollarID, "BullID", BullID, sep=" ")
+      ID <- paste("CollarID", CollarID, "Calf", BullID, sep=" ")
       
       holdFrame <- data.frame(ID, expFix, fix, early, late, missing, errenousDates, noFix, outBounds)
       outputFrame <- rbind(outputFrame, holdFrame)
@@ -806,16 +816,17 @@ gpsSummaryRaw <- function(results, badDates, zeros, out)
     }
     
   }
-  # 
-  # sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
-  # 
-  # outputFrame$fix <- outputFrame$fix / sumFix * 100
-  # outputFrame$early <- outputFrame$early / sumFix * 100
-  # outputFrame$late <- outputFrame$late / sumFix * 100
-  # outputFrame$missing <- outputFrame$missing / sumFix * 100
-  # outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
-  # outputFrame$noFix <- outputFrame$noFix / sumFix * 100
-  # outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
+   # comment out section below if you dont want summary results in percentages
+  
+   #sumFix <- (outputFrame$fix +  outputFrame$early + outputFrame$late + abs(outputFrame$missing) + outputFrame$errenousDates + outputFrame$noFix + outputFrame$outBounds)
+   
+   #outputFrame$fix <- outputFrame$fix / sumFix * 100
+   #outputFrame$early <- outputFrame$early / sumFix * 100
+   #outputFrame$late <- outputFrame$late / sumFix * 100
+   #outputFrame$missing <- outputFrame$missing / sumFix * 100
+   #outputFrame$errenousDates <- outputFrame$errenousDates / sumFix * 100
+   #outputFrame$noFix <- outputFrame$noFix / sumFix * 100
+   #outputFrame$outBounds <- outputFrame$outBounds / sumFix * 100
   
   return(outputFrame)
 }
@@ -1208,3 +1219,4 @@ filterZeroGPS <- function(dataIn)
   }
   return(dataList)
 }
+
